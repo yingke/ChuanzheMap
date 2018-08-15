@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".map.GetAddrActivity">
+
+    <com.amap.api.maps2d.MapView
+        android:id="@+id/gaodemap"
+        android:layout_width="match_parent"
+        android:layout_height="330dp" />
+
+    <TextView
+        android:id="@+id/tv_dizhi"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dp"
+        android:text="@string/xiangxidizhi"
+        android:textSize="18sp" />
+
+    <Button
+        android:id="@+id/addbtnok"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/login_ok" />
+
+
+</LinearLayout>
