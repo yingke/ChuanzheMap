@@ -38,7 +38,8 @@
 
         <activity android:name=".map.AddItemActivity" />
         <activity android:name=".map.GetAddrActivity" />
-        <activity android:name=".map.QiandaoActivity"></activity>
+        <activity android:name=".map.QiandaoActivity" />
+        <activity android:name=".map.PointDetalActivity"></activity>
     </application>
 
 </manifest>

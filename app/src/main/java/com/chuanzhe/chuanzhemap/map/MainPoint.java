@@ -76,7 +76,7 @@ public class MainPoint extends AppCompatActivity implements LocationSource,
         Intent intent = getIntent();
        // Bundle myBundle = this.getIntent().getSerializableExtra();
         project = (MapProject) intent.getSerializableExtra("id");
-      getmarks(project.getObjectId());
+        getmarks(project.getObjectId());
 
 
     }
@@ -210,7 +210,7 @@ public class MainPoint extends AppCompatActivity implements LocationSource,
                     addMarkers(list);
 
                 }else{
-                    Log.i("bmob","失败："+e.getMessage()+","+e.getErrorCode());
+                    Log.i("bmob","chaxun失败："+e.getMessage()+","+e.getErrorCode());
                 }
             }
         });
@@ -221,17 +221,25 @@ public class MainPoint extends AppCompatActivity implements LocationSource,
 
         ArrayList<MarkerOptions> markerOptionlst = new ArrayList<MarkerOptions>();
         for (int i = 0; i < object.size(); i++) {
-            LatLng latLng = new LatLng(object.get(i).getLatitude(), object.get(i).getLongitude());
-            String title = object.get(i).getShopname();
-            // String miaoshu = object.get(i).getMiaoshu();
-            MarkerOptions markerOption = new MarkerOptions();
-            markerOption.icon(BitmapDescriptorFactory.fromBitmap(BitmapFactory
-                    .decodeResource(getResources(), R.mipmap.marker)));
-            String  s  = object.get(i).getUpdatedAt().substring(0,10)+","+object.get(i).getCunhuoliang()+","+object.get(i).getBuhuoliang();
-            markerOption.position(latLng);
-            markerOption.title(title).snippet(s);
-            markerOptionlst.add(markerOption);
-            aMap.addMarker(markerOption).setObject(object.get(i));
+            Double lat= object.get(i).getLatitude();
+            Double lon = object.get(i).getLongitude();
+
+            if (lat == null | lon ==null){
+                continue;
+            }else {
+
+                String title = object.get(i).getShopname();
+                LatLng latLng = new LatLng(lat,lon);
+                MarkerOptions markerOption = new MarkerOptions();
+                markerOption.icon(BitmapDescriptorFactory.fromBitmap(BitmapFactory
+                        .decodeResource(getResources(), R.mipmap.marker)));
+                String  s  = object.get(i).getUpdatedAt().substring(0,10)+","+object.get(i).getCunhuoliang()+","+object.get(i).getBuhuoliang();
+                markerOption.position(latLng);
+                markerOption.title(title).snippet(s);
+                markerOptionlst.add(markerOption);
+                aMap.addMarker(markerOption).setObject(object.get(i));
+            }
+
 
 
         }
@@ -298,6 +306,9 @@ public class MainPoint extends AppCompatActivity implements LocationSource,
     protected void onResume() {
         super.onResume();
         mapView.onResume();
+        aMap.clear();
+        getmarks(project.getObjectId());
+        Log.i("bmob","onResume()");
     }
 
     /**
@@ -308,6 +319,7 @@ public class MainPoint extends AppCompatActivity implements LocationSource,
         super.onPause();
         mapView.onPause();
         deactivate();
+        Log.i("bmob","onPause()");
     }
 
     /**
@@ -317,6 +329,8 @@ public class MainPoint extends AppCompatActivity implements LocationSource,
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         mapView.onSaveInstanceState(outState);
+
+        Log.i("bmob","onSaveInstanceState");
     }
 
     /**
@@ -329,6 +343,7 @@ public class MainPoint extends AppCompatActivity implements LocationSource,
         if(null != mlocationClient){
             mlocationClient.onDestroy();
         }
+        Log.i("bmob","onDestroy()");
     }
 
 
@@ -345,7 +360,7 @@ public class MainPoint extends AppCompatActivity implements LocationSource,
         Bundle bundle = new Bundle();
         bundle.putSerializable("items",items);
         intent.putExtras(bundle);
-        intent.setClass(MainPoint.this, QiandaoActivity.class);
+        intent.setClass(MainPoint.this, PointDetalActivity.class);
 
         startActivity(intent);
     }

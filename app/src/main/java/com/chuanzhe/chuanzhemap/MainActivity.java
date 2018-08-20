@@ -166,7 +166,7 @@ public class MainActivity extends AppCompatActivity implements MyItemClickListen
 
     private void getdate(){
         BmobQuery<MapProject> query = new BmobQuery<MapProject>();
-        query.addWhereEqualTo("user", BmobUser.getCurrentUser(MyUser.class));
+        query.addWhereEqualTo("myUser", BmobUser.getCurrentUser(MyUser.class));
         query.findObjects(new FindListener<MapProject>() {
             @Override
             public void done(List<MapProject> list, BmobException e) {

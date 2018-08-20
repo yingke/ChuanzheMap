@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -36,8 +37,8 @@ public class AddItemActivity extends AppCompatActivity {
     private Double latitude;
     private Double longitude;
 
-    private int isvip;
-    private int isfree;
+    private int isvip = 0;
+    private int isfree = 0;
     private Button btn_getadd ;
     private Button btn_ok ;
     MyUser userInfo;
@@ -98,35 +99,53 @@ public class AddItemActivity extends AppCompatActivity {
         String shopname = et_shouname.getText().toString().trim();
         String kehu = et_kehu.getText().toString().trim();
         String kehuphone = et_kehuphone.getText().toString().trim();
-        PointItems items = new PointItems();
-        items.setUnm(unm);
-        items.setShopname(shopname);
-        items.setKehu(kehu);
-        items.setKehuphone(kehuphone);
-        items.setDizhi(dizhi);
-        Log.i("save",latitude+"");
-        items.setLatitude(latitude);
-        items.setLongitude(longitude);
-        items.setIsvip(isvip);
-        items.setIsfree(isfree);
-        userInfo = BmobUser.getCurrentUser(MyUser.class);;
-        items.setAmyuser(userInfo);
-        items.setMapProject(objectid);
-        items.setCunhuoliang(0);
-        items.setBuhuoliang(0);
-        items.save(new SaveListener<String>() {
-            @Override
-            public void done(String s, BmobException e) {
-                if(e==null){
+        userInfo = BmobUser.getCurrentUser(MyUser.class);
 
-                    toast("添加数据成功，返回objectId为："+s);
-                    finish();
-                }else{
-                    toast("创建数据失败：" + e.getMessage());
-                    Log.i("保存",e.getMessage());
+        if(TextUtils.isEmpty(unm)){
+            et_shopnum.setError("店铺编码不能为空");
+        }else  if(TextUtils.isEmpty(shopname)){
+            et_shouname.setError("店铺名称不能为空");
+        }else if (TextUtils.isEmpty(kehu)){
+            et_kehu.setError("客户姓名不能为空");
+        }else if (TextUtils.isEmpty(kehuphone)){
+            et_kehuphone.setError("客户电话不能为空");
+        }else if (TextUtils.isEmpty(dizhi)){
+            et_addr.setError("地址不能为空");
+        }else {
+
+            PointItems items = new PointItems();
+            items.setUnm(unm);
+            items.setShopname(shopname);
+            items.setKehu(kehu);
+            items.setKehuphone(kehuphone);
+            items.setDizhi(dizhi);
+            Log.i("save",latitude+"");
+            items.setLatitude(latitude);
+            items.setLongitude(longitude);
+            items.setIsvip(isvip);
+            items.setIsfree(isfree);
+
+            items.setAmyuser(userInfo);
+            items.setMapProject(objectid);
+            items.setCunhuoliang(0);
+            items.setBuhuoliang(0);
+            items.save(new SaveListener<String>() {
+                @Override
+                public void done(String s, BmobException e) {
+                    if(e==null){
+
+                        toast("添加数据成功，返回objectId为："+s);
+                        finish();
+                    }else{
+                        toast("创建数据失败：" + e.getMessage());
+                        Log.i("保存",e.getMessage());
+                    }
                 }
-            }
-        });
+            });
+
+
+
+        }
 
 
     }
