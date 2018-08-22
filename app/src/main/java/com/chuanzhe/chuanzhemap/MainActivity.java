@@ -14,9 +14,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
 import android.widget.Toast;
-
 import com.chuanzhe.chuanzhemap.adapter.MapRVAdapter;
 import com.chuanzhe.chuanzhemap.adapter.MyItemClickListener;
 import com.chuanzhe.chuanzhemap.bean.MapProject;
@@ -25,6 +23,7 @@ import com.chuanzhe.chuanzhemap.login.LoginActivity;
 import com.chuanzhe.chuanzhemap.map.MainPoint;
 import com.chuanzhe.chuanzhemap.utility.C;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -43,6 +42,7 @@ public class MainActivity extends AppCompatActivity implements MyItemClickListen
     RecyclerView rc;
     @BindView(R.id.fab)
     FloatingActionButton fab;
+
 
     @OnClick(R.id.fab) void add() {
         if (myUser.getIsAdmin() == 1){
@@ -176,4 +176,6 @@ public class MainActivity extends AppCompatActivity implements MyItemClickListen
             }
         });
     }
+
+
 }

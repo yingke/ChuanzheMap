@@ -18,12 +18,17 @@ public class PointItems extends BmobObject {
     private MyUser amyuser;
     private int isvip;
     private int isfree;
+    private String imgurl;
 
    private int cunhuoliang;
    private int buhuoliang;
 
+    public PointItems() {
 
-    public PointItems(String unm, String shopname, String kehu, String kehuphone, String dizhi, Double latitude, Double longitude, MapProject mapProject, MyUser amyuser, int isvip, int isfree,  int cunhuoliang, int buhuoliang) {
+    }
+
+    public PointItems(String tableName, String unm, String shopname, String kehu, String kehuphone, String dizhi, Double latitude, Double longitude, MapProject mapProject, MyUser amyuser, int isvip, int isfree, String imgurl, int cunhuoliang, int buhuoliang) {
+        super(tableName);
         this.unm = unm;
         this.shopname = shopname;
         this.kehu = kehu;
@@ -35,12 +40,9 @@ public class PointItems extends BmobObject {
         this.amyuser = amyuser;
         this.isvip = isvip;
         this.isfree = isfree;
-
+        this.imgurl = imgurl;
         this.cunhuoliang = cunhuoliang;
         this.buhuoliang = buhuoliang;
-    }
-
-    public PointItems() {
     }
 
     public String getUnm() {
@@ -129,6 +131,14 @@ public class PointItems extends BmobObject {
 
     public void setIsfree(int isfree) {
         this.isfree = isfree;
+    }
+
+    public String getImgurl() {
+        return imgurl;
+    }
+
+    public void setImgurl(String imgurl) {
+        this.imgurl = imgurl;
     }
 
     public int getCunhuoliang() {

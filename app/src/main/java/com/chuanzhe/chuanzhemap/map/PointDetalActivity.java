@@ -8,12 +8,14 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.chuanzhe.chuanzhemap.R;
 import com.chuanzhe.chuanzhemap.adapter.DetalPointAdapter;
 import com.chuanzhe.chuanzhemap.bean.PointItems;
 import com.chuanzhe.chuanzhemap.bean.Qiandao;
+import com.chuanzhe.chuanzhemap.utility.DownloadImageTask;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,6 +38,8 @@ public class PointDetalActivity extends AppCompatActivity {
     @BindView(R.id.tv_detal_vip)TextView tv_vip;
     @BindView(R.id.detalfab)
     FloatingActionButton fab;
+    @BindView(R.id.main_iv_placeholder)
+    ImageView imageView;
 
     @BindView(R.id.detal_rec) RecyclerView recyclerView;
     private DetalPointAdapter adapter;
@@ -67,6 +71,7 @@ public class PointDetalActivity extends AppCompatActivity {
         tv_bianhao.setText("编号："+items.getUnm());
         tv_kehu.setText("客户："+items.getKehu());
         tv_phone.setText("电话："+items.getKehuphone());
+        new DownloadImageTask(imageView).execute(items.getImgurl());;
         if (items.getIsfree()==0){
             tv_iszs.setText("赠送：是");
         }else {

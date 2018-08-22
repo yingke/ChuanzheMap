@@ -135,8 +135,14 @@ public class MainPoint extends AppCompatActivity implements LocationSource,
         if (!addPermission(permissionsList, Manifest.permission.ACCESS_COARSE_LOCATION)) {
             permissionsNeeded.add("位置权限");
         }
+        if (!addPermission(permissionsList, Manifest.permission.ACCESS_FINE_LOCATION)) {
+            permissionsNeeded.add("GPS");
+        }
         if (!addPermission(permissionsList, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
             permissionsNeeded.add("文件管理权限");
+        }
+        if (!addPermission(permissionsList, Manifest.permission.CAMERA)) {
+            permissionsNeeded.add("拍照权限");
         }
 
         if (permissionsNeeded.size() > 0) {

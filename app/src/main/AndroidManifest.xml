@@ -11,6 +11,11 @@
     <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.CAMERA"/>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-feature android:name="android.hardware.camera" />
+    <uses-feature android:name="android.hardware.camera.autofocus" />
 
     <application
         android:allowBackup="true"
@@ -40,6 +45,16 @@
         <activity android:name=".map.GetAddrActivity" />
         <activity android:name=".map.QiandaoActivity" />
         <activity android:name=".map.PointDetalActivity"></activity>
+        <provider
+            android:authorities="com.chuanzhe.chuanzhemap"
+            android:name="android.support.v4.content.FileProvider"
+            android:grantUriPermissions="true"
+            >
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/filepaths" />
+
+        </provider>
     </application>
 
 </manifest>
