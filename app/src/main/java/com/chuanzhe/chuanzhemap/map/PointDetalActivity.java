@@ -7,14 +7,20 @@ import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.chuanzhe.chuanzhemap.R;
 import com.chuanzhe.chuanzhemap.adapter.DetalPointAdapter;
+import com.chuanzhe.chuanzhemap.bean.MapProject;
+import com.chuanzhe.chuanzhemap.bean.MyUser;
 import com.chuanzhe.chuanzhemap.bean.PointItems;
 import com.chuanzhe.chuanzhemap.bean.Qiandao;
+import com.chuanzhe.chuanzhemap.utility.C;
 import com.chuanzhe.chuanzhemap.utility.DownloadImageTask;
 
 import java.util.ArrayList;
@@ -23,6 +29,7 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import cn.bmob.v3.BmobQuery;
+import cn.bmob.v3.BmobUser;
 import cn.bmob.v3.datatype.BmobPointer;
 import cn.bmob.v3.exception.BmobException;
 import cn.bmob.v3.listener.FindListener;
@@ -56,6 +63,37 @@ public class PointDetalActivity extends AppCompatActivity {
         getDetal(items);
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_detal, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        if (item.getItemId() == R.id.action_edit) {
+            if (items.getAmyuser().getObjectId().equals(BmobUser.getCurrentUser(MyUser.class).getObjectId()) ){
+                Toast.makeText(this,"编辑",Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent();
+                Bundle bundle = new Bundle();
+                MapProject project = items.getMapProject();
+                bundle.putSerializable("id",project);
+                bundle.putSerializable("point",items);
+                bundle.putString(C.ACTION, C.EDIT);
+                intent.putExtras(bundle);
+                intent.setClass(PointDetalActivity.this, AddItemActivity.class);
+                startActivity(intent);
+            }else {
+                Toast.makeText(this,"您无权修改",Toast.LENGTH_SHORT).show();
+            }
+
+            return true;
+        }
+
+
+        return super.onOptionsItemSelected(item);
+    }
     public  void qiandao(View view){
         Intent intent = new Intent();
         Bundle bundle = new Bundle();
@@ -71,13 +109,13 @@ public class PointDetalActivity extends AppCompatActivity {
         tv_bianhao.setText("编号："+items.getUnm());
         tv_kehu.setText("客户："+items.getKehu());
         tv_phone.setText("电话："+items.getKehuphone());
-        new DownloadImageTask(imageView).execute(items.getImgurl());;
-        if (items.getIsfree()==0){
+        new DownloadImageTask(imageView).execute(items.getImgurl());
+        if (items.getIsfree()==1){
             tv_iszs.setText("赠送：是");
         }else {
             tv_iszs.setText("赠送：否");
         }
-        if (items.getIsvip()==0){
+        if (items.getIsvip()==1){
             tv_vip.setText("VIP：是");
         }else {
             tv_vip.setText("VIP：否");

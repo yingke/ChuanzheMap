@@ -20,6 +20,9 @@ import com.chuanzhe.chuanzhemap.R;
 import com.chuanzhe.chuanzhemap.bean.MapProject;
 import com.chuanzhe.chuanzhemap.bean.MyUser;
 import com.chuanzhe.chuanzhemap.bean.PointItems;
+import com.chuanzhe.chuanzhemap.utility.C;
+import com.chuanzhe.chuanzhemap.utility.DownloadImageTask;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -27,6 +30,7 @@ import cn.bmob.v3.BmobUser;
 import cn.bmob.v3.datatype.BmobFile;
 import cn.bmob.v3.exception.BmobException;
 import cn.bmob.v3.listener.SaveListener;
+import cn.bmob.v3.listener.UpdateListener;
 import cn.bmob.v3.listener.UploadFileListener;
 
 public class AddItemActivity extends AppCompatActivity {
@@ -51,10 +55,12 @@ public class AddItemActivity extends AppCompatActivity {
 
     private int isvip = 0;
     private int isfree = 0;
-    private Button btn_getadd ;
+    private Button btn_getaddr ;
     private Button btn_ok ;
     MyUser userInfo;
-    private String imgpath;
+    private String imgpath =null;
+    private String action;
+    private PointItems item;
 
 
     @Override
@@ -64,7 +70,12 @@ public class AddItemActivity extends AppCompatActivity {
         ActionBar actionBar =getSupportActionBar();
         actionBar.setTitle("添加");
         Intent i = getIntent();
-        objectid  = (MapProject) i.getSerializableExtra("id");;
+        objectid  = (MapProject) i.getSerializableExtra("id");
+        action = i.getStringExtra(C.ACTION);
+        Log.i("添加页传值",action);
+        if (action.equals(C.EDIT)){
+          item = (PointItems) i.getSerializableExtra("point")  ;
+        }
         initview();
 
     }
@@ -74,11 +85,36 @@ public class AddItemActivity extends AppCompatActivity {
         et_shouname =findViewById(R.id.et_shpomane);
         et_kehu =findViewById(R.id.et_kehu);
         et_kehuphone =findViewById(R.id.et_kehuphone);
-        btn_getadd = findViewById(R.id.btn_add);
+        btn_ok = findViewById(R.id.btn_add);
         et_addr = findViewById(R.id.et_dizhi);
         sw_vip =findViewById(R.id.switch_vip);
         sw_free = findViewById(R.id.switch_free);
         imageView = findViewById(R.id.imageView);
+        if(action.equals(C.EDIT)){
+            btn_ok.setText("修改");
+            et_shouname.setText(item.getShopname());
+            et_shopnum.setText(item.getUnm());
+            et_kehu.setText(item.getKehu());
+            et_kehuphone.setText(item.getKehuphone());
+            Log.i("free",item.getIsfree()+"");
+            if (item.getIsfree()==0){
+              sw_free.setChecked(false);
+            }else {
+                sw_free.setChecked(true);
+            }
+            if (item.getIsvip()==0){
+                sw_vip.setChecked(false);
+            }else {
+                sw_vip.setChecked(true);
+            }
+            new DownloadImageTask(imageView).execute(item.getImgurl());
+            dizhi =item.getDizhi();
+            et_addr.setText(dizhi);
+            latitude = item.getLatitude();
+            longitude = item.getLongitude();
+
+        }
+
 
         sw_vip.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
@@ -124,83 +160,145 @@ public class AddItemActivity extends AppCompatActivity {
          kehuphone = et_kehuphone.getText().toString().trim();
          userInfo = BmobUser.getCurrentUser(MyUser.class);
 
-        if (TextUtils.isEmpty(imgpath)){
-            toast("请选择店铺图片");
-        }else if(TextUtils.isEmpty(unm)){
-            et_shopnum.setError("店铺编码不能为空");
-        }else if(TextUtils.isEmpty(shopname)){
-            et_shouname.setError("店铺名称不能为空");
-        }else if (TextUtils.isEmpty(kehu)){
-            et_kehu.setError("客户姓名不能为空");
-        }else if (TextUtils.isEmpty(kehuphone)){
-            et_kehuphone.setError("客户电话不能为空");
-        }else if (TextUtils.isEmpty(dizhi)){
-            et_addr.setError("地址不能为空");
-        } else if(TextUtils.isEmpty(unm)){
-            et_shopnum.setError("店铺编码不能为空");
-        }else  if(TextUtils.isEmpty(shopname)){
-            et_shouname.setError("店铺名称不能为空");
-        }else if (TextUtils.isEmpty(kehu)){
-            et_kehu.setError("客户姓名不能为空");
-        }else if (TextUtils.isEmpty(kehuphone)){
-            et_kehuphone.setError("客户电话不能为空");
-        }else if (TextUtils.isEmpty(dizhi)){
-            et_addr.setError("地址不能为空");
-        }else {
+         if (action.equals(C.EDIT)){
+           final  PointItems updataitem = new PointItems();
+             updataitem.setUnm(unm);
+             updataitem.setShopname(shopname);
+             updataitem.setKehu(kehu);
+             updataitem.setKehuphone(kehuphone);
+             updataitem.setDizhi(dizhi);
+             Log.i("save",latitude+"");
+             updataitem.setLatitude(latitude);
+             updataitem.setLongitude(longitude);
+             updataitem.setIsvip(isvip);
+             updataitem.setIsfree(isfree);
+             updataitem.setAmyuser(userInfo);
+             updataitem.setMapProject(objectid);
+             if (TextUtils.isEmpty(imgpath)){
 
-           final BmobFile bmobFile = new BmobFile(new File(imgpath));
-            bmobFile.uploadblock(new UploadFileListener() {
+                 updataitem.update(item.getObjectId(), new UpdateListener() {
+                     @Override
+                     public void done(BmobException e) {
+                         if(e==null){
+                             finish();
+                         }else{
+                             Log.i("bmob","更新失败："+e.getMessage()+","+e.getErrorCode());
+                         }
+                     }
+                 });
+             }else {
+                 final BmobFile file = new BmobFile(new File(imgpath));
+                 file.uploadblock(new UploadFileListener() {
 
-                @Override
-                public void done(BmobException e) {
-                    if(e==null){
-                        //bmobFile.getFileUrl()--返回的上传文件的完整地址
-                        //toast("上传文件成功:" + bmobFile.getFileUrl());
+                     @Override
+                     public void done(BmobException e) {
+                         if(e==null){
+                             updataitem.setImgurl(file.getFileUrl());
+                             updataitem.update(item.getObjectId(), new UpdateListener() {
+                                 @Override
+                                 public void done(BmobException e) {
+                                     if(e==null){
+                                         Log.i("bmob","更新成功");
 
-                        PointItems items = new PointItems();
-                        items.setUnm(unm);
-                        items.setShopname(shopname);
-                        items.setKehu(kehu);
-                        items.setKehuphone(kehuphone);
-                        items.setDizhi(dizhi);
-                        Log.i("save",latitude+"");
-                        items.setLatitude(latitude);
-                        items.setLongitude(longitude);
-                        items.setIsvip(isvip);
-                        items.setIsfree(isfree);
-                        items.setImgurl(bmobFile.getFileUrl());
-                        items.setAmyuser(userInfo);
-                        items.setMapProject(objectid);
-                        items.setCunhuoliang(0);
-                        items.setBuhuoliang(0);
-                        items.save(new SaveListener<String>() {
-                            @Override
-                            public void done(String s, BmobException e) {
-                                if(e==null){
+                                         finish();
+                                     }else{
+                                         Log.i("bmob","更新失败："+e.getMessage()+","+e.getErrorCode());
+                                     }
+                                 }
+                             });
 
-                                    toast("添加数据成功，返回objectId为："+s);
-                                    finish();
-                                }else{
-                                    toast("创建数据失败：" + e.getMessage());
-                                    Log.i("保存",e.getMessage());
-                                }
-                            }
-                        });
+                         }else{
+                             toast("上传文件失败：" + e.getMessage());
+                         }
 
-                    }else{
-                        toast("上传文件失败：" + e.getMessage());
-                    }
+                     }
 
-                }
+                     @Override
+                     public void onProgress(Integer value) {
+                         // 返回的上传进度（百分比）
+                     }
+                 });
+             }
 
-                @Override
-                public void onProgress(Integer value) {
-                    // 返回的上传进度（百分比）
-                }
-            });
+         }else {
+             if (TextUtils.isEmpty(imgpath)){
+                 toast("请选择店铺图片");
+             }else if(TextUtils.isEmpty(unm)){
+                 et_shopnum.setError("店铺编码不能为空");
+             }else if(TextUtils.isEmpty(shopname)){
+                 et_shouname.setError("店铺名称不能为空");
+             }else if (TextUtils.isEmpty(kehu)){
+                 et_kehu.setError("客户姓名不能为空");
+             }else if (TextUtils.isEmpty(kehuphone)){
+                 et_kehuphone.setError("客户电话不能为空");
+             }else if (TextUtils.isEmpty(dizhi)){
+                 et_addr.setError("地址不能为空");
+             } else if(TextUtils.isEmpty(unm)){
+                 et_shopnum.setError("店铺编码不能为空");
+             }else  if(TextUtils.isEmpty(shopname)){
+                 et_shouname.setError("店铺名称不能为空");
+             }else if (TextUtils.isEmpty(kehu)){
+                 et_kehu.setError("客户姓名不能为空");
+             }else if (TextUtils.isEmpty(kehuphone)){
+                 et_kehuphone.setError("客户电话不能为空");
+             }else if (TextUtils.isEmpty(dizhi)){
+                 et_addr.setError("地址不能为空");
+             }else {
 
-        }
+                 final BmobFile bmobFile = new BmobFile(new File(imgpath));
+                 Log.i("path000",imgpath);
+                 bmobFile.uploadblock(new UploadFileListener() {
 
+                     @Override
+                     public void done(BmobException e) {
+                         if(e==null){
+                             //bmobFile.getFileUrl()--返回的上传文件的完整地址
+                             //toast("上传文件成功:" + bmobFile.getFileUrl());
+
+                             PointItems items = new PointItems();
+                             items.setUnm(unm);
+                             items.setShopname(shopname);
+                             items.setKehu(kehu);
+                             items.setKehuphone(kehuphone);
+                             items.setDizhi(dizhi);
+                             Log.i("save",latitude+"");
+                             items.setLatitude(latitude);
+                             items.setLongitude(longitude);
+                             items.setIsvip(isvip);
+                             items.setIsfree(isfree);
+                             items.setImgurl(bmobFile.getFileUrl());
+                             items.setAmyuser(userInfo);
+                             items.setMapProject(objectid);
+                             items.setCunhuoliang(0);
+                             items.setBuhuoliang(0);
+                             items.save(new SaveListener<String>() {
+                                 @Override
+                                 public void done(String s, BmobException e) {
+                                     if(e==null){
+
+                                         toast("添加数据成功，返回objectId为："+s);
+                                         finish();
+                                     }else{
+                                         toast("创建数据失败：" + e.getMessage());
+                                         Log.i("保存",e.getMessage());
+                                     }
+                                 }
+                             });
+
+                         }else{
+                             toast("上传文件失败：" + e.getMessage());
+                         }
+
+                     }
+
+                     @Override
+                     public void onProgress(Integer value) {
+                         // 返回的上传进度（百分比）
+                     }
+                 });
+
+             }
+         }
 
         }
 

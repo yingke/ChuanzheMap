@@ -31,12 +31,14 @@ import com.amap.api.maps2d.model.LatLng;
 import com.amap.api.maps2d.model.Marker;
 import com.amap.api.maps2d.model.MarkerOptions;
 import com.amap.api.maps2d.model.MyLocationStyle;
-import com.chuanzhe.chuanzhemap.MainActivity;
 import com.chuanzhe.chuanzhemap.R;
 import com.chuanzhe.chuanzhemap.bean.MapProject;
 import com.chuanzhe.chuanzhemap.bean.PointItems;
+import com.chuanzhe.chuanzhemap.utility.C;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import butterknife.BindView;
@@ -117,6 +119,7 @@ public class MainPoint extends AppCompatActivity implements LocationSource,
         Intent intent = new Intent();
         Bundle bundle = new Bundle();
         bundle.putSerializable("id",project);
+        bundle.putString(C.ACTION, C.ADD);
         intent.putExtras(bundle);
         intent.setClass(MainPoint.this, AddItemActivity.class);
 
@@ -224,21 +227,45 @@ public class MainPoint extends AppCompatActivity implements LocationSource,
     }
 
     private void addMarkers(List<PointItems> object) {
+        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");//设置日期格式
+        String Currentdate = df.format(new Date());
+
 
         ArrayList<MarkerOptions> markerOptionlst = new ArrayList<MarkerOptions>();
         for (int i = 0; i < object.size(); i++) {
             Double lat= object.get(i).getLatitude();
             Double lon = object.get(i).getLongitude();
+            long date = C.getDistanceTime(object.get(i).getUpdatedAt(),Currentdate);
+            String color = DateDistance(date,15,30,45);
+
+            Log.i("date","Currentdate:"+Currentdate+"||"+object.get(i).getUpdatedAt()+"||"+color+"||"+date);
+
+
+
 
             if (lat == null | lon ==null){
                 continue;
             }else {
 
+
                 String title = object.get(i).getShopname();
                 LatLng latLng = new LatLng(lat,lon);
                 MarkerOptions markerOption = new MarkerOptions();
-                markerOption.icon(BitmapDescriptorFactory.fromBitmap(BitmapFactory
-                        .decodeResource(getResources(), R.mipmap.marker)));
+
+                if (color.equals(C.GREEN)){
+                    markerOption.icon(BitmapDescriptorFactory.fromBitmap(BitmapFactory
+                            .decodeResource(getResources(), R.mipmap.green)));
+                }else if (color.equals(C.YELLOW)){
+                    markerOption.icon(BitmapDescriptorFactory.fromBitmap(BitmapFactory
+                            .decodeResource(getResources(), R.mipmap.yellow)));
+                }else if (color.equals(C.BLUE)){
+                    markerOption.icon(BitmapDescriptorFactory.fromBitmap(BitmapFactory
+                            .decodeResource(getResources(), R.mipmap.blue)));
+                }else if (color.equals(C.RED)){
+                    markerOption.icon(BitmapDescriptorFactory.fromBitmap(BitmapFactory
+                            .decodeResource(getResources(), R.mipmap.red)));
+                }
+
                 String  s  = object.get(i).getUpdatedAt().substring(0,10)+","+object.get(i).getCunhuoliang()+","+object.get(i).getBuhuoliang();
                 markerOption.position(latLng);
                 markerOption.title(title).snippet(s);
@@ -369,6 +396,19 @@ public class MainPoint extends AppCompatActivity implements LocationSource,
         intent.setClass(MainPoint.this, PointDetalActivity.class);
 
         startActivity(intent);
+    }
+
+
+    public  String DateDistance(long t,long i,long j,long k){
+        if(t>=0 && t<=i){
+            return C.GREEN;
+        }else if (t>i && t<=j){
+            return C.YELLOW;
+        }else if (t>k&&t>=k){
+            return C.BLUE;
+        }else {
+            return C.RED;
+        }
     }
 }
 
