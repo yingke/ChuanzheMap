@@ -11,7 +11,7 @@ import java.util.Date;
  */
 public class C {
 
-    public static String Bmob_APPID="997fece55e856c01c6c83a2e55c64ef5";
+    public static String Bmob_APPID="";
     public static String EDIT = "edit";
     public static String ADD ="add";
     public static String ACTION = "action";

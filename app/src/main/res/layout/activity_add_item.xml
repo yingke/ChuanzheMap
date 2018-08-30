@@ -136,12 +136,13 @@
     <Button
         android:id="@+id/btn_getaddr"
         style="@style/btn_style"
-        android:layout_width="66dp"
-        android:layout_height="37dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="5dp"
         android:layout_marginBottom="4dp"
-        android:layout_marginStart="12dp"
-        android:text="@string/getaddr"
+
         android:onClick="getadd"
+        android:text="@string/getaddr"
         app:layout_constraintBottom_toBottomOf="@+id/et_dizhi"
         app:layout_constraintStart_toEndOf="@+id/et_dizhi"
         tools:ignore="OnClick" />

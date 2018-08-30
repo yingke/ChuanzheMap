@@ -1,12 +1,12 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context="com.chuanzhe.chuanzhemap.map.PointDetalActivity">
+    tools:context="com.chuanzhe.chuanzhemap.map.MainPoint">
     <item
-        android:id="@+id/action_edit"
+        android:id="@+id/action_search"
         android:orderInCategory="0"
-        android:icon="@android:drawable/ic_menu_edit"
+        app:actionViewClass="android.support.v7.widget.SearchView"
         app:showAsAction="ifRoom"
-        android:title="编辑" />
+        android:title="sousuo" />
 
 </menu>

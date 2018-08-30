@@ -306,26 +306,30 @@ public class AddItemActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        switch (requestCode){
-            case 0:
-                Bundle b=data.getExtras();
-                dizhi = b.getString("dizhi");
-                et_addr.setText(dizhi);
-                latitude = b.getDouble("latitude");
-                Log.i("onresult",latitude+"");
-                longitude  =b.getDouble("longitude");
-                Log.i("result",dizhi+latitude);
-                break;
-            case 1:
 
-                Bundle extras = data.getExtras();
-                Bitmap imageBitmap = (Bitmap) extras.get("data");
-                imageView.setImageBitmap(imageBitmap);
-                imgpath= saveImage("crop", imageBitmap);
-                Log.i("path",imgpath);
+        if (null != data){
+            switch (requestCode){
+                case 0:
+                    Bundle b=data.getExtras();
+                    dizhi = b.getString("dizhi");
+                    et_addr.setText(dizhi);
+                    latitude = b.getDouble("latitude");
+                    Log.i("onresult",latitude+"");
+                    longitude  =b.getDouble("longitude");
+                    Log.i("result",dizhi+latitude);
+                    break;
+                case 1:
 
-                break;
+                    Bundle extras = data.getExtras();
+                    Bitmap imageBitmap = (Bitmap) extras.get("data");
+                    imageView.setImageBitmap(imageBitmap);
+                    imgpath= saveImage("crop", imageBitmap);
+                    Log.i("path",imgpath);
+
+                    break;
+            }
         }
+
     }
 
 

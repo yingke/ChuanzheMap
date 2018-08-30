@@ -18,15 +18,17 @@
     <string name="login">若有帐号，请直接登录</string>
     <string name="Registered">注册</string>
     <string name="shopnum">店铺编号</string>
-    <string name="shopname">点铺名称</string>
-    <string name="shopaddr">点铺地址</string>
+    <string name="shopname">店铺名称</string>
+    <string name="shopaddr">店铺地址</string>
     <string name="shopimg">添加图片</string>
     <string name="kehuname">客户姓名</string>
     <string name="kehuphone">客户电话</string>
-    <string name="getaddr">获取地址</string>
+    <string name="getaddr">获取</string>
     <string name="kehuleixing">客户vip</string>
     <string name="zengsong">是否赠送</string>
     <string name="xiangxidizhi">详细地址:</string>
+    <string name="search">搜索</string>
+    <string name="searchhint">请输入店铺编号或者手机号</string>
 
 
 </resources>

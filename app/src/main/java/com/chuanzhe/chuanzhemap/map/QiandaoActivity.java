@@ -104,23 +104,17 @@ public class QiandaoActivity extends AppCompatActivity implements AMapLocationLi
                                            }
                                        });
                                    }
-
                                }
                            });
                        }else {
                            toast("签到失败");
                        }
-
                    }
                });
            }
-
        }
 
-
-
     }
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
