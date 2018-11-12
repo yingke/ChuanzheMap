@@ -8,7 +8,6 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
-
     <style name="btn_style" >
         <item name="android:background">@color/btn_background</item>
         <item name="android:textColor">@android:color/white</item>

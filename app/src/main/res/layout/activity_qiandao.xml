@@ -59,7 +59,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="32dp"
+        android:layout_marginTop="44dp"
         android:text="存货量:"
         android:textSize="16sp"
         app:layout_constraintStart_toStartOf="parent"
@@ -83,24 +83,14 @@
         style="@style/btn_style"
         android:layout_width="233dp"
         android:layout_height="42dp"
-        android:layout_marginTop="44dp"
+        android:layout_marginTop="56dp"
         android:text="签到"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView4"
+        app:layout_constraintTop_toBottomOf="@+id/et_cunhuoliang"
         tools:ignore="MissingConstraints" />
 
-    <Button
-        android:id="@+id/btn_detail"
-        style="@style/btn_style"
-        android:layout_width="233dp"
-        android:layout_height="42dp"
-        android:layout_marginTop="28dp"
-        android:text="详情"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.503"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/btn_qiandao" />
+
 
 
 </android.support.constraint.ConstraintLayout>

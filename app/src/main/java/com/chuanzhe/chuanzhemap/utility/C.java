@@ -1,5 +1,9 @@
 package com.chuanzhe.chuanzhemap.utility;
 
+import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -11,7 +15,8 @@ import java.util.Date;
  */
 public class C {
 
-    public static String Bmob_APPID="";
+   // public static String Bmob_APPID="997fece55e856c01c6c83a2e55c64ef5";
+    public static String Bmob_APPID="403798590fdc882b6adb812b53524dd9";
     public static String EDIT = "edit";
     public static String ADD ="add";
     public static String ACTION = "action";
@@ -19,6 +24,8 @@ public class C {
     public static String YELLOW = "yellow";
     public static String GREEN = "green";
     public static String RED = "red";
+    public static String BLACK = "black";
+    public static  String GARY = "gray";
 
     public static long getDistanceTime(String str1, String str2) {
         DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -48,4 +55,12 @@ public class C {
         }
         return day ;
     }
+
+    public static boolean isNetworkConnected(Context context) {
+        if (context != null) {
+            ConnectivityManager mConnectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+            NetworkInfo mNetworkInfo = mConnectivityManager.getActiveNetworkInfo();
+            if (mNetworkInfo != null) {
+                return mNetworkInfo.isAvailable();          }
+        }     return false;  }
 }

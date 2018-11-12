@@ -1,4 +1,5 @@
 package com.chuanzhe.chuanzhemap;
+//adb uninstall com.chuanzhe.chuanzhemap
 
 import android.Manifest;
 import android.annotation.TargetApi;
@@ -25,7 +26,7 @@ import com.chuanzhe.chuanzhemap.adapter.MyItemClickListener;
 import com.chuanzhe.chuanzhemap.bean.MapProject;
 import com.chuanzhe.chuanzhemap.bean.MyUser;
 import com.chuanzhe.chuanzhemap.login.LoginActivity;
-import com.chuanzhe.chuanzhemap.map.MainPoint;
+import com.chuanzhe.chuanzhemap.map.MainProject;
 import com.chuanzhe.chuanzhemap.utility.C;
 import java.util.ArrayList;
 import java.util.List;
@@ -98,7 +99,7 @@ public class MainActivity extends AppCompatActivity implements MyItemClickListen
         Bundle bundle = new Bundle();
         bundle.putSerializable("id",mapProject);
         intent.putExtras(bundle);
-        intent.setClass(MainActivity.this, MainPoint.class);
+        intent.setClass(MainActivity.this, MainProject.class);
 
         startActivity(intent);
 
@@ -169,16 +170,24 @@ public class MainActivity extends AppCompatActivity implements MyItemClickListen
     }
 
     private void getdate(){
-        BmobQuery<MapProject> query = new BmobQuery<MapProject>();
-        query.addWhereEqualTo("myUser", BmobUser.getCurrentUser(MyUser.class));
-        query.findObjects(new FindListener<MapProject>() {
-            @Override
-            public void done(List<MapProject> list, BmobException e) {
-                Log.i("list","LLLL"+list.size());
-                prolist.addAll(list);
-                adapter.notifyDataSetChanged();
-            }
-        });
+
+        if(C.isNetworkConnected(this)){
+            BmobQuery<MapProject> query = new BmobQuery<MapProject>();
+            query.addWhereEqualTo("myUser", BmobUser.getCurrentUser(MyUser.class));
+            query.findObjects(new FindListener<MapProject>() {
+                @Override
+                public void done(List<MapProject> list, BmobException e) {
+                    Log.i("list","LLLL"+list.size());
+                    prolist.addAll(list);
+                    adapter.notifyDataSetChanged();
+                }
+            });
+
+        }else {
+            fab.setVisibility(View.GONE);
+            toast("暂无网络····");
+        }
+
     }
 
 

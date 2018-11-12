@@ -16,33 +16,59 @@ public class PointItems extends BmobObject {
     private Double longitude;
     private MapProject mapProject;
     private MyUser amyuser;
-    private int isvip;
-    private int isfree;
     private String imgurl;
+    private  String qiandaotime;
+   private Integer cunhuoliang;
+   private Integer buhuoliang;
+   private String zhouqi;
+   private Integer isDelete;
+   private Integer isfavorite;
 
-   private int cunhuoliang;
-   private int buhuoliang;
+
+    public String getZhouqi() {
+        return zhouqi;
+    }
+
+    public void setZhouqi(String zhouqi) {
+        this.zhouqi = zhouqi;
+    }
+
+    private String beizhu;
 
     public PointItems() {
 
     }
 
-    public PointItems(String tableName, String unm, String shopname, String kehu, String kehuphone, String dizhi, Double latitude, Double longitude, MapProject mapProject, MyUser amyuser, int isvip, int isfree, String imgurl, int cunhuoliang, int buhuoliang) {
-        super(tableName);
-        this.unm = unm;
-        this.shopname = shopname;
-        this.kehu = kehu;
-        this.kehuphone = kehuphone;
-        this.dizhi = dizhi;
-        this.latitude = latitude;
-        this.longitude = longitude;
-        this.mapProject = mapProject;
-        this.amyuser = amyuser;
-        this.isvip = isvip;
-        this.isfree = isfree;
-        this.imgurl = imgurl;
+    public Integer getCunhuoliang() {
+        return cunhuoliang;
+    }
+
+    public void setCunhuoliang(Integer cunhuoliang) {
         this.cunhuoliang = cunhuoliang;
+    }
+
+    public Integer getBuhuoliang() {
+        return buhuoliang;
+    }
+
+    public void setBuhuoliang(Integer buhuoliang) {
         this.buhuoliang = buhuoliang;
+    }
+
+    public Integer getIsDelete() {
+        return isDelete;
+    }
+
+    public void setIsDelete(Integer isDelete) {
+        this.isDelete = isDelete;
+    }
+
+    public Integer getIsfavorite() {
+        return isfavorite;
+    }
+
+    public void setIsfavorite(Integer isfavorite) {
+        this.isfavorite = isfavorite;
     }
 
     public String getUnm() {
@@ -85,6 +111,15 @@ public class PointItems extends BmobObject {
         this.dizhi = dizhi;
     }
 
+
+    public String getBeizhu() {
+        return beizhu;
+    }
+
+    public void setBeizhu(String beizhu) {
+        this.beizhu = beizhu;
+    }
+
     public Double getLatitude() {
         return latitude;
     }
@@ -117,21 +152,6 @@ public class PointItems extends BmobObject {
         this.amyuser = amyuser;
     }
 
-    public int getIsvip() {
-        return isvip;
-    }
-
-    public void setIsvip(int isvip) {
-        this.isvip = isvip;
-    }
-
-    public int getIsfree() {
-        return isfree;
-    }
-
-    public void setIsfree(int isfree) {
-        this.isfree = isfree;
-    }
 
     public String getImgurl() {
         return imgurl;
@@ -141,19 +161,34 @@ public class PointItems extends BmobObject {
         this.imgurl = imgurl;
     }
 
-    public int getCunhuoliang() {
-        return cunhuoliang;
+    public String getQiandaotime() {
+        return qiandaotime;
     }
 
-    public void setCunhuoliang(int cunhuoliang) {
-        this.cunhuoliang = cunhuoliang;
+    public void setQiandaotime(String qiandaotime) {
+        this.qiandaotime = qiandaotime;
     }
 
-    public int getBuhuoliang() {
-        return buhuoliang;
-    }
-
-    public void setBuhuoliang(int buhuoliang) {
-        this.buhuoliang = buhuoliang;
+    @Override
+    public String toString() {
+        return "PointItems{" +
+                "unm='" + unm + '\'' +
+                ", shopname='" + shopname + '\'' +
+                ", kehu='" + kehu + '\'' +
+                ", kehuphone='" + kehuphone + '\'' +
+                ", dizhi='" + dizhi + '\'' +
+                ", latitude=" + latitude +
+                ", longitude=" + longitude +
+                ", mapProject=" + mapProject +
+                ", amyuser=" + amyuser +
+                ", imgurl='" + imgurl + '\'' +
+                ", qiandaotime='" + qiandaotime + '\'' +
+                ", cunhuoliang=" + cunhuoliang +
+                ", buhuoliang=" + buhuoliang +
+                ", zhouqi='" + zhouqi + '\'' +
+                ", isDelete=" + isDelete +
+                ", isfavorite=" + isfavorite +
+                ", beizhu='" + beizhu + '\'' +
+                '}';
     }
 }

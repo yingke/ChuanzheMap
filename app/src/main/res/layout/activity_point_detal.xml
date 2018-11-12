@@ -77,7 +77,7 @@
                 android:layout_width="150dp"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/tv_detal_kehu"
-                android:text="赠送：是"
+                android:text="补货周期:"
                 android:textColor="@color/colorAccent" />
 
             <TextView
@@ -87,7 +87,7 @@
                 android:layout_alignParentEnd="true"
                 android:layout_below="@+id/tv_detal_kehu"
                 android:layout_toRightOf="@id/tv_detal_iszs"
-                android:text="VIP：是"
+                android:text="备注"
                 android:paddingLeft="30dp"
                 android:textColor="@color/colorAccent" />
 
@@ -112,7 +112,16 @@
         android:layout_margin="@dimen/fab_margin"
         app:srcCompat="@drawable/qd"
        android:onClick="qiandao"
-
+        />
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/daohangfab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/fab_margin"
+        app:srcCompat="@drawable/dh"
+        android:onClick="daohang"
+        app:layout_anchor="@id/main_iv_placeholder"
+        app:layout_anchorGravity="bottom|right|end"
 
         />
 

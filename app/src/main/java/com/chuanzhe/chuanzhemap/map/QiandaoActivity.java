@@ -19,6 +19,9 @@ import com.chuanzhe.chuanzhemap.bean.MyUser;
 import com.chuanzhe.chuanzhemap.bean.PointItems;
 import com.chuanzhe.chuanzhemap.bean.Qiandao;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -34,86 +37,91 @@ public class QiandaoActivity extends AppCompatActivity implements AMapLocationLi
     EditText et_cunhuo;
     @BindView(R.id.et_dingdanhao)
     EditText et_dingdan;
-
     @BindView(R.id.btn_qiandao)
     Button btn_qiandao;
     private PointItems items;
     private int cunhuo = 0;
     private int buhuo = 0;
     private String dingdanhao;
-    String id;
+    private String id;
     private Double latitude;
     private Double longitude;
     //声明AMapLocationClient类对象
     public AMapLocationClient mLocationClient = null;
     private LatLng piontLatlng;
     private LatLng currlatlon;
-
-
+    private Boolean isqiandaoing = true;
     //声明AMapLocationClientOption对象
     public AMapLocationClientOption option = null;
-//初始化定位
-
-//设置定位回调监听
-
-
-
 
     @OnClick(R.id.btn_qiandao) void qiandao(){
-        piontLatlng =new LatLng(items.getLatitude(),items.getLongitude());
-        currlatlon = new LatLng(latitude,longitude);
-       Float juli =  AMapUtils.calculateLineDistance(piontLatlng,currlatlon);
-       Log.i("距离：","=="+juli);
-       if (juli>200.00){
-           toast("请到店铺附近签到");
-       }else {
 
-           cunhuo = Integer.valueOf(et_cunhuo.getText().toString().trim());
-           buhuo = Integer.valueOf(et_buhuo.getText().toString().trim());
-           dingdanhao = et_dingdan.getText().toString().trim();
-           if(TextUtils.isEmpty(dingdanhao)){
-               et_dingdan.setError("订单号不能为空");
-           }else {
-               Qiandao qiandao = new Qiandao();
-               qiandao.setCunhuoliang(cunhuo);
-               qiandao.setBuhuoliang(buhuo);
-               qiandao.setDingdanhao(dingdanhao);
-               qiandao.setUser(BmobUser.getCurrentUser(MyUser.class));
-               qiandao.setItems(items);
+        if (isqiandaoing){
+            isqiandaoing = false;
+            piontLatlng =new LatLng(items.getLatitude(),items.getLongitude());
+            currlatlon = new LatLng(latitude,longitude);
+            Float juli =  AMapUtils.calculateLineDistance(piontLatlng,currlatlon);
+            Log.i("距离：","=="+juli);
+            if (juli>500.00){
+                isqiandaoing = true;
+                toast("请到店铺附近签到");
+            }else {
 
-               qiandao.save(new SaveListener<String>() {
-                   @Override
-                   public void done(String s, BmobException e) {
-                       id=s;
-                       if(e == null){
-                           PointItems pointItems = new PointItems();
-                           pointItems.setCunhuoliang(cunhuo);
-                           pointItems.setBuhuoliang(buhuo);
-                           pointItems.update(items.getObjectId(), new UpdateListener() {
-                               @Override
-                               public void done(BmobException e) {
-                                   if(e==null){
-                                       finish();
-                                   }else {
-                                       Qiandao q= new Qiandao();
-                                       q.setObjectId(id);
-                                       q.delete(new UpdateListener() {
-                                           @Override
-                                           public void done(BmobException e) {
+                cunhuo = Integer.valueOf(et_cunhuo.getText().toString().trim());
+                buhuo = Integer.valueOf(et_buhuo.getText().toString().trim());
+                dingdanhao = et_dingdan.getText().toString().trim();
 
-                                           }
-                                       });
-                                   }
-                               }
-                           });
-                       }else {
-                           toast("签到失败");
-                       }
-                   }
-               });
-           }
-       }
+                    Qiandao qiandao = new Qiandao();
+                    qiandao.setCunhuoliang(cunhuo);
+                    qiandao.setBuhuoliang(buhuo);
+                    qiandao.setDingdanhao(dingdanhao);
+                    qiandao.setUser(BmobUser.getCurrentUser(MyUser.class));
+                    qiandao.setItems(items);
 
+                    qiandao.save(new SaveListener<String>() {
+                        @Override
+                        public void done(String s, BmobException e) {
+                            id=s;
+                            if(e == null){
+                                PointItems pointItems = new PointItems();
+                                pointItems.setCunhuoliang(cunhuo);
+                                pointItems.setBuhuoliang(buhuo);
+                                SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");//设置日期格式
+                                String Currentdate = df.format(new Date());
+
+                                pointItems.setQiandaotime(Currentdate);
+                                pointItems.setIsfavorite(0);
+
+                                pointItems.update(items.getObjectId(), new UpdateListener() {
+                                    @Override
+                                    public void done(BmobException e) {
+                                        if(e==null){
+                                            toast("签到成功");
+                                            finish();
+
+                                        }else {
+                                            Qiandao q= new Qiandao();
+                                            q.setObjectId(id);
+                                            q.delete(new UpdateListener() {
+                                                @Override
+                                                public void done(BmobException e) {
+                                                    isqiandaoing = true;
+
+                                                }
+                                            });
+                                        }
+                                    }
+                                });
+                            }else {
+                                isqiandaoing = true;
+                                toast("签到失败");
+                            }
+                        }
+                    });
+
+            }
+
+        }
     }
 
     @Override
@@ -128,7 +136,6 @@ public class QiandaoActivity extends AppCompatActivity implements AMapLocationLi
         mLocationClient.setLocationListener(this);
 
         setmap();
-
 
     }
 
@@ -160,7 +167,6 @@ public class QiandaoActivity extends AppCompatActivity implements AMapLocationLi
 
     }
 
-
     private void toast(String s){
         Toast.makeText(QiandaoActivity.this,s, Toast.LENGTH_SHORT).show();
 
@@ -175,7 +181,7 @@ public class QiandaoActivity extends AppCompatActivity implements AMapLocationLi
                 latitude = aMapLocation.getLatitude();
                 longitude = aMapLocation.getLongitude();
                 String dizhi= aMapLocation.getAddress();
-                toast(longitude+dizhi+latitude);
+
             }else {
                 //定位失败时，可通过ErrCode（错误码）信息来确定失败的原因，errInfo是错误信息，详见错误码表。
                 Log.e("AmapError","location Error, ErrCode:"
@@ -183,9 +189,6 @@ public class QiandaoActivity extends AppCompatActivity implements AMapLocationLi
                         + aMapLocation.getErrorInfo());
             }
         }
-
-
-
 
     }
 
@@ -206,8 +209,6 @@ public class QiandaoActivity extends AppCompatActivity implements AMapLocationLi
     protected void onDestroy() {
         super.onDestroy();
         mLocationClient.onDestroy();
-
     }
-
 
 }
