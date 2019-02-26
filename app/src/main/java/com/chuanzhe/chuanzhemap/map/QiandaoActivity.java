@@ -1,9 +1,10 @@
 package com.chuanzhe.chuanzhemap.map;
 
-import android.support.v7.app.AppCompatActivity;
+import android.content.Intent;
 import android.os.Bundle;
-import android.text.TextUtils;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -40,8 +41,8 @@ public class QiandaoActivity extends AppCompatActivity implements AMapLocationLi
     @BindView(R.id.btn_qiandao)
     Button btn_qiandao;
     private PointItems items;
-    private int cunhuo = 0;
-    private int buhuo = 0;
+    private Integer cunhuo = 0;
+    private Integer buhuo = 0;
     private String dingdanhao;
     private String id;
     private Double latitude;
@@ -51,6 +52,9 @@ public class QiandaoActivity extends AppCompatActivity implements AMapLocationLi
     private LatLng piontLatlng;
     private LatLng currlatlon;
     private Boolean isqiandaoing = true;
+    private Qiandao q0;
+    private Qiandao q1;
+    private boolean issamedate;
     //声明AMapLocationClientOption对象
     public AMapLocationClientOption option = null;
 
@@ -124,12 +128,26 @@ public class QiandaoActivity extends AppCompatActivity implements AMapLocationLi
         }
     }
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_qiandao);
         ButterKnife.bind(this);
-        items = (PointItems) getIntent().getSerializableExtra("items");
+        Intent intent = getIntent();
+        Bundle b=intent.getExtras();
+        items = (PointItems) intent.getSerializableExtra("items");
+//        q0 = (Qiandao) intent.getSerializableExtra("q0");
+//        issamedate = b.getBoolean("issamedate");
+//
+//        if (issamedate ){
+//            q1 = (Qiandao) intent.getSerializableExtra("q1");
+//
+//            et_buhuo.setText(q0.getBuhuoliang());
+//            et_cunhuo.setText(q0.getCunhuoliang());
+//            et_dingdan.setText(q0.getDingdanhao());
+//        }
+
 
         mLocationClient = new AMapLocationClient(getApplication());
 
@@ -138,6 +156,14 @@ public class QiandaoActivity extends AppCompatActivity implements AMapLocationLi
         setmap();
 
     }
+
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+
+        return super.onKeyDown(keyCode, event);
+    }
+
 
     private void setmap() {
         /**

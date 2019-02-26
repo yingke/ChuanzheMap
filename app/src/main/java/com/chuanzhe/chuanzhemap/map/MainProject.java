@@ -2,12 +2,10 @@ package com.chuanzhe.chuanzhemap.map;
 
 import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
-import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -19,10 +17,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
-import android.widget.TextView;
 import android.widget.Toast;
-
 import com.amap.api.location.AMapLocation;
 import com.amap.api.location.AMapLocationClient;
 import com.amap.api.location.AMapLocationClientOption;
@@ -39,28 +34,25 @@ import com.amap.api.maps2d.model.LatLng;
 import com.amap.api.maps2d.model.Marker;
 import com.amap.api.maps2d.model.MarkerOptions;
 import com.amap.api.maps2d.model.MyLocationStyle;
-import com.amap.api.services.core.AMapException;
 import com.amap.api.services.core.LatLonPoint;
 import com.amap.api.services.geocoder.GeocodeResult;
 import com.amap.api.services.geocoder.GeocodeSearch;
 import com.amap.api.services.geocoder.RegeocodeQuery;
 import com.amap.api.services.geocoder.RegeocodeResult;
-import com.chuanzhe.chuanzhemap.MainActivity;
 import com.chuanzhe.chuanzhemap.R;
 import com.chuanzhe.chuanzhemap.bean.MapProject;
 import com.chuanzhe.chuanzhemap.bean.PointItems;
 import com.chuanzhe.chuanzhemap.utility.C;
-
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-
 import butterknife.ButterKnife;
 import cn.bmob.v3.BmobQuery;
 import cn.bmob.v3.exception.BmobException;
 import cn.bmob.v3.listener.FindListener;
+import cn.bmob.v3.listener.QueryListener;
 
 public class MainProject extends AppCompatActivity  implements LocationSource,
         AMapLocationListener,GeocodeSearch.OnGeocodeSearchListener ,
@@ -77,15 +69,14 @@ public class MainProject extends AppCompatActivity  implements LocationSource,
     private MarkerOptions markerOption;
     private int limit = 100; // 每页的数据是500条
     private int curPage = 0; // 当前页的编号，从0开始
-    private int zhouqi;
     private Marker curShowWindowMarker;
-
-    Integer d =0;
-    Integer f = 0;
-
-
+    private SimpleDateFormat df ;//设置日期格式
+    private String Currentdate ;
+    private Integer d ;//删除状态
+    private  Integer f ; //收藏状态
+    private String Pointid = null;
+    private int code =1024;
     private MapProject project;
-
     @SuppressLint("HandlerLeak")
     Handler handler = new Handler(){
         @Override
@@ -96,36 +87,30 @@ public class MainProject extends AppCompatActivity  implements LocationSource,
             addMarkers(list);
             if (list.size() == limit){
                 querydata(id,curPage);
+            }else {
+                dismissDialog();
             }
         }
     };
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_point);
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         ButterKnife.bind(this);
         ActionBar actionBar =getSupportActionBar();
-
         initview();
         mapView.onCreate(savedInstanceState);
-
         project = (MapProject) getIntent().getSerializableExtra("id");
         actionBar.setTitle(project.getProjectname());
         id = project.getObjectId();
-
-
-
+        curPage = 0;
+        querydata(id , curPage);
     }
-
-
 
     private void initview() {
         mapView = findViewById(R.id.map);
-
-        //progDialog = new ProgressDialog(this);
-
+        progDialog = new ProgressDialog(this);
         setmap();
     }
 
@@ -136,12 +121,30 @@ public class MainProject extends AppCompatActivity  implements LocationSource,
         bundle.putString(C.ACTION, C.ADD);
         intent.putExtras(bundle);
         intent.setClass(MainProject.this, AddItemActivity.class);
-
-        startActivity(intent);
+        startActivityForResult(intent,code);
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (data !=null){
+            switch (requestCode){
+                case 1024:
+                   String ssid = data.getStringExtra("b");
+                    BmobQuery<PointItems> query = new BmobQuery<PointItems>();
+                    query.getObject(ssid, new QueryListener<PointItems>() {
+                        @Override
+                        public void done(PointItems items, BmobException e) {
+                            getmarkinfo(items);
+                        }
+                    });
+                    break;
+            }
+        }
+    }
 
-    private void  querydata(String s ,  int Page){
+    private void  querydata(String s , int Page){
+        showDialog();
         BmobQuery<PointItems> pointItemBmobQuery = new BmobQuery<PointItems>();
         pointItemBmobQuery.addWhereEqualTo("mapProject",s);
         pointItemBmobQuery.setLimit(limit);
@@ -157,108 +160,94 @@ public class MainProject extends AppCompatActivity  implements LocationSource,
                     bundle.putParcelableArrayList("list",(ArrayList)list);
                     msg.setData(bundle);
                     handler.sendMessage(msg);
-
-
-
                     curPage ++;
                 }else{
                     Log.i("bmob","chaxun失败："+e.getMessage()+","+e.getErrorCode());
                 }
             }
         });
-
     }
 
-
     private void addMarkers(List<PointItems> object) {
-        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");//设置日期格式
-        String Currentdate = df.format(new Date());
-
-
+         df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");//设置日期格式
+         Currentdate = df.format(new Date());
         ArrayList<MarkerOptions> markerOptionlst = new ArrayList<MarkerOptions>();
         for (int i = 0; i < object.size(); i++) {
-            long date = 0;
-            PointItems options = object.get(i);
-            Log.i("bmob",options.toString());
-            Double lat= options.getLatitude();
-            Double lon = options.getLongitude();
-            String  s;
-            if (null == options.getQiandaotime()){
-                date = C.getDistanceTime(options.getUpdatedAt(),Currentdate);
-                s  = options.getUpdatedAt().substring(0,10)+","+options.getCunhuoliang()+","+options.getBuhuoliang();
+            getmarkinfo(object.get(i));
+        }
+    }
+    public void getmarkinfo( PointItems options  ){
+        String  color = C.GARY;
+        String  s ="";
+        long date = 0;
+        Double lat= options.getLatitude();
+        Double lon = options.getLongitude();
+        Integer cunhuo = options.getCunhuoliang();
+        Integer buhuo = options.getBuhuoliang();
+        String qiaodaotime = options.getQiandaotime();
+        String UpdatedAt = options.getUpdatedAt();
+        String zhouqi = options.getZhouqi();
+        Integer buhuozhouqi =options.getBuhuozhouqi();
+        d = options.getIsDelete();
+        f =options.getIsfavorite();
+        String title = options.getShopname();
+        if (lat == null | lon ==null){
+
+        }else {
+            if (null == qiaodaotime){
+                date = C.getDistanceTime(UpdatedAt,Currentdate);
+                s  =UpdatedAt.substring(0,10)+","+cunhuo+","+buhuo;
             }else {
-                date = C.getDistanceTime(options.getQiandaotime(),Currentdate);
-                s  = options.getQiandaotime().substring(0,10)+","+options.getCunhuoliang()+","+options.getBuhuoliang();
+                date = C.getDistanceTime(qiaodaotime,Currentdate);
+                s  = qiaodaotime.substring(0,10)+","+cunhuo+","+buhuo;
             }
-
-            String color;
-
-           d = options.getIsDelete();
-           f =options.getIsfavorite();
-          if (d ==null ){
-              d =0;
-          }
-          if (f ==null){
-              f = 0;
-          }
-
-
+            if (d ==null ){
+                d =0;
+            }
+            if (f ==null){
+                f = 0;
+            }
             if ( d ==0){
-
                 if (f ==0){
-
-                    if(options.getZhouqi()!=null){
-                        color = getZhouqi(date,Integer.valueOf(options.getZhouqi()));
+                    if (buhuozhouqi !=null && buhuozhouqi!= 0){
+                        color = getZhouqi(date,buhuozhouqi);
                     }else {
                         color = getZhouqi(date,30);
                     }
                 }else {
                     color =C.BLACK;
                 }
-
             }else {
                 color = C.GARY;
             }
-
-
-
-
-            if (lat == null | lon ==null){
-                continue;
-            }else {
-
-                String title = options.getShopname();
-                LatLng latLng = new LatLng(lat,lon);
-                MarkerOptions markerOption = new MarkerOptions();
-
-                if (color.equals(C.GREEN)){
-                    markerOption.icon(BitmapDescriptorFactory.fromBitmap(BitmapFactory
-                            .decodeResource(getResources(), R.mipmap.green)));
-                }else if (color.equals(C.YELLOW)){
-                    markerOption.icon(BitmapDescriptorFactory.fromBitmap(BitmapFactory
-                            .decodeResource(getResources(), R.mipmap.yellow)));
-                }else if (color.equals(C.BLUE)){
-                    markerOption.icon(BitmapDescriptorFactory.fromBitmap(BitmapFactory
-                            .decodeResource(getResources(), R.mipmap.blue)));
-                }else if (color.equals(C.RED)){
-                    markerOption.icon(BitmapDescriptorFactory.fromBitmap(BitmapFactory
-                            .decodeResource(getResources(), R.mipmap.red)));
-                }else if (color.equals(C.BLACK)){
-                    markerOption.icon(BitmapDescriptorFactory.fromBitmap(BitmapFactory
-                            .decodeResource(getResources(), R.mipmap.black)));
-                }else if (color.equals(C.GARY)){
-                    markerOption.icon(BitmapDescriptorFactory.fromBitmap(BitmapFactory
-                            .decodeResource(getResources(), R.mipmap.gray)));
-                }
-
-
-                markerOption.position(latLng);
-                markerOption.title(title).snippet(s);
-                markerOptionlst.add(markerOption);
-                aMap.addMarker(markerOption).setObject(object.get(i));
-            }
-
         }
+        LatLng latLng = new LatLng(lat,lon);
+        MarkerOptions markerOption = new MarkerOptions();
+
+        if (color.equals(C.GREEN)){
+            markerOption.icon(BitmapDescriptorFactory.fromBitmap(BitmapFactory
+                    .decodeResource(getResources(), R.mipmap.green)));
+        }else if (color.equals(C.YELLOW)){
+            markerOption.icon(BitmapDescriptorFactory.fromBitmap(BitmapFactory
+                    .decodeResource(getResources(), R.mipmap.yellow)));
+        }else if (color.equals(C.BLUE)){
+            markerOption.icon(BitmapDescriptorFactory.fromBitmap(BitmapFactory
+                    .decodeResource(getResources(), R.mipmap.blue)));
+        }else if (color.equals(C.RED)){
+            markerOption.icon(BitmapDescriptorFactory.fromBitmap(BitmapFactory
+                    .decodeResource(getResources(), R.mipmap.red)));
+        }else if (color.equals(C.BLACK)){
+            markerOption.icon(BitmapDescriptorFactory.fromBitmap(BitmapFactory
+                    .decodeResource(getResources(), R.mipmap.black)));
+        }else if (color.equals(C.GARY)){
+            markerOption.icon(BitmapDescriptorFactory.fromBitmap(BitmapFactory
+                    .decodeResource(getResources(), R.mipmap.gray)));
+        }
+
+        markerOption.position(latLng);
+        markerOption.title(title).snippet(s);
+        aMap.addMarker(markerOption).setObject(options);
+
     }
     /*
     * t  时间
@@ -288,13 +277,11 @@ public class MainProject extends AppCompatActivity  implements LocationSource,
     }
 
     private void setmap() {
-
         if(aMap == null){
             // 显示地图
             aMap = mapView.getMap();
             CameraUpdate mCameraUpdate = CameraUpdateFactory.zoomTo(16);
             aMap.moveCamera(mCameraUpdate);
-
         }
         aMap.getUiSettings().setZoomPosition(AMapOptions.ZOOM_POSITION_RIGHT_CENTER);//设置缩放按钮去位置
         MyLocationStyle myLocationStyle = new MyLocationStyle();
@@ -312,24 +299,18 @@ public class MainProject extends AppCompatActivity  implements LocationSource,
         aMap.setOnInfoWindowClickListener(this);
         aMap.getUiSettings().setMyLocationButtonEnabled(true);// 设置默认定位按钮是否显示
         aMap.setMyLocationEnabled(true);// 设置为true表示显示定位层并可触发定位，false表示隐藏定位层并不可触发定位，默认是false
-        // aMap.setMyLocationType()
-
         geocoderSearch = new GeocodeSearch(this);
         geocoderSearch.setOnGeocodeSearchListener(this);
-       // aMap.setOnMapClickListener(this);
         markerOption = new MarkerOptions();
     }
-
 
     @Override
     public void onLocationChanged(AMapLocation aMapLocation) {
         if (mListener != null && aMapLocation != null) {
-
             if (aMapLocation != null
                     && aMapLocation.getErrorCode() == 0) {
                 mListener.onLocationChanged(aMapLocation);// 显示系统小蓝点
                 LatLonPoint latLonPoint = new LatLonPoint(aMapLocation.getLatitude(),aMapLocation.getLongitude());
-
             } else {
                 String errText = "定位失败," + aMapLocation.getErrorCode()+ ": " + aMapLocation.getErrorInfo();
                 Log.e("AmapErr",errText);
@@ -340,7 +321,6 @@ public class MainProject extends AppCompatActivity  implements LocationSource,
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_search, menu);
-
         MenuItem searchItem = menu.findItem(R.id.action_search);
         SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
         searchView.setSubmitButtonEnabled(true);//显示提交按钮
@@ -349,8 +329,8 @@ public class MainProject extends AppCompatActivity  implements LocationSource,
             @Override
             public boolean onQueryTextSubmit(String query) {
                 //提交按钮的点击事件
-                Toast.makeText(MainProject.this, query, Toast.LENGTH_SHORT).show();
-
+               // Toast.makeText(MainProject.this, query, Toast.LENGTH_SHORT).show();
+                 showDialog();
                 BmobQuery<PointItems> id = new BmobQuery<PointItems>();
                 id.addWhereEqualTo("mapProject",project.getObjectId());
 
@@ -367,7 +347,7 @@ public class MainProject extends AppCompatActivity  implements LocationSource,
                     public void done(List<PointItems> list, BmobException e) {
                         if(e==null){
 
-
+                           dismissDialog();
                             LatLng latLng =new LatLng(list.get(0).getLatitude(),list.get(0).getLongitude());
                             changeCamera(CameraUpdateFactory.newCameraPosition(new CameraPosition(
                                     latLng , 18, 30, 30)));
@@ -377,15 +357,13 @@ public class MainProject extends AppCompatActivity  implements LocationSource,
 
                         }else{
                             Log.i("bmob","失败："+e.getMessage()+","+e.getErrorCode());
+                            dismissDialog();
                         }
                     }
                 });
 
-
-
                 return true;
             }
-
             @Override
             public boolean onQueryTextChange(String newText) {
                 //当输入框内容改变的时候回调
@@ -393,10 +371,8 @@ public class MainProject extends AppCompatActivity  implements LocationSource,
                 return true;
             }
         });
-
         return true;
     }
-
 
     @Override
     public void activate(OnLocationChangedListener onLocationChangedListener) {
@@ -428,8 +404,6 @@ public class MainProject extends AppCompatActivity  implements LocationSource,
         mlocationClient = null;
     }
 
-
-
     /**
      * 方法必须重写
      */
@@ -437,20 +411,26 @@ public class MainProject extends AppCompatActivity  implements LocationSource,
     protected void onResume() {
         super.onResume();
         mapView.onResume();
-        Log.i("bmob","inresume");
-        curPage = 0;
 
-        querydata(id , curPage);
+        if (Pointid ==null){
 
+        }else {
+
+            BmobQuery<PointItems> query = new BmobQuery<PointItems>();
+            query.getObject(Pointid, new QueryListener<PointItems>() {
+                @Override
+                public void done(PointItems items, BmobException e) {
+                    getmarkinfo(items);
+                }
+            });
+        }
 
     }
 
 
     private void toast(String s){
         Toast.makeText(MainProject.this,s,Toast.LENGTH_SHORT).show();
-
     }
-
     /**
      * 方法必须重写
      */
@@ -460,7 +440,6 @@ public class MainProject extends AppCompatActivity  implements LocationSource,
         mapView.onPause();
         deactivate();
     }
-
     /**
      * 方法必须重写
      */
@@ -469,7 +448,6 @@ public class MainProject extends AppCompatActivity  implements LocationSource,
         super.onSaveInstanceState(outState);
         mapView.onSaveInstanceState(outState);
     }
-
     /**
      * 方法必须重写
      */
@@ -484,22 +462,6 @@ public class MainProject extends AppCompatActivity  implements LocationSource,
      */
     @Override
     public void onRegeocodeSearched(RegeocodeResult result, int i) {
-       /* dismissDialog();
-        if (i == AMapException.CODE_AMAP_SUCCESS) {
-            if (result != null && result.getRegeocodeAddress() != null
-                    && result.getRegeocodeAddress().getFormatAddress() != null) {
-                dizhi = result.getRegeocodeAddress().getFormatAddress();
-                tv_dizhi.setText("地址："+dizhi);
-
-                //*addressName = result.getRegeocodeAddress().getFormatAddress()
-                     //   + "附近";
-
-            } else {
-
-            }
-        } else {
-
-        }*/
 
     }
 
@@ -540,20 +502,17 @@ public class MainProject extends AppCompatActivity  implements LocationSource,
             progDialog.dismiss();
         }
     }
-
-
-
-
     @Override
     public boolean onMarkerClick(Marker marker) {
         curShowWindowMarker = marker;
         marker.showInfoWindow();
         return true;
     }
-
     @Override
     public void onInfoWindowClick(Marker marker) {
         PointItems items = (PointItems) marker.getObject();
+        Pointid = items.getObjectId();
+
         Intent intent = new Intent();
         Bundle bundle = new Bundle();
         bundle.putSerializable("items",items);
@@ -562,7 +521,7 @@ public class MainProject extends AppCompatActivity  implements LocationSource,
         intent.setClass(MainProject.this, PointDetalActivity.class);
 
         startActivity(intent);
-
+        marker.remove();
     }
 
 
@@ -572,8 +531,6 @@ public class MainProject extends AppCompatActivity  implements LocationSource,
     private void changeCamera(CameraUpdate update) {
 
         aMap.moveCamera(update);
-
-
     }
 
     @Override
@@ -581,11 +538,7 @@ public class MainProject extends AppCompatActivity  implements LocationSource,
         if(curShowWindowMarker!=null){
             curShowWindowMarker.hideInfoWindow();
         }
-
     }
 
 
-
-
 }
-

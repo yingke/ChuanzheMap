@@ -7,29 +7,33 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
+import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
+
 import com.chuanzhe.chuanzhemap.adapter.MapRVAdapter;
 import com.chuanzhe.chuanzhemap.adapter.MyItemClickListener;
 import com.chuanzhe.chuanzhemap.bean.MapProject;
 import com.chuanzhe.chuanzhemap.bean.MyUser;
 import com.chuanzhe.chuanzhemap.login.LoginActivity;
-import com.chuanzhe.chuanzhemap.map.MainProject;
 import com.chuanzhe.chuanzhemap.utility.C;
+
 import java.util.ArrayList;
 import java.util.List;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -99,13 +103,30 @@ public class MainActivity extends AppCompatActivity implements MyItemClickListen
         Bundle bundle = new Bundle();
         bundle.putSerializable("id",mapProject);
         intent.putExtras(bundle);
-        intent.setClass(MainActivity.this, MainProject.class);
+
+       intent.setClass(MainActivity.this,Main2Activity.class);
 
         startActivity(intent);
 
 
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+
+        getMenuInflater().inflate(R.menu.userinfo,menu);
+
+
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+       //toast(myUser.getUsername()+"222222");
+        dialog();
+
+        return super.onOptionsItemSelected(item);
+    }
 
     private  void addproject(){
         View v = LayoutInflater.from(MainActivity.this).inflate(R.layout.dialog_view,null);
@@ -133,7 +154,12 @@ public class MainActivity extends AppCompatActivity implements MyItemClickListen
                     et_projectmiaoshu.setError("项目描述不能为空");
 
                 }else {
-                    MapProject mapProject = new MapProject(pro_name,pro_miaoshu,BmobUser.getCurrentUser(MyUser.class));
+                    MapProject mapProject = new MapProject();
+                    mapProject.setProjectname(pro_name);
+                    mapProject.setProjectmiaoshu(pro_miaoshu);
+                    mapProject.setMyUser(BmobUser.getCurrentUser(MyUser.class));
+                    mapProject.setMaxcycle(60);
+                    mapProject.setMincycle(3);
                     mapProject.save(new SaveListener<String>() {
                         @Override
                         public void done(String s, BmobException e) {
@@ -188,6 +214,41 @@ public class MainActivity extends AppCompatActivity implements MyItemClickListen
             toast("暂无网络····");
         }
 
+    }
+
+
+
+    protected void dialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+        builder.setMessage("确认退出当前账户吗？");
+
+        builder.setTitle("提示");
+
+        builder.setPositiveButton("确认", new DialogInterface.OnClickListener() {
+
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                BmobUser.logOut();   //清除缓存用户对象
+                if(BmobUser.getCurrentUser() == null){
+                    startActivity(new Intent(MainActivity.this,LoginActivity.class));
+                    finish();
+                }
+
+
+                dialog.dismiss();
+
+            }
+        });
+
+        builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
+
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+
+        builder.create().show();
     }
 
 

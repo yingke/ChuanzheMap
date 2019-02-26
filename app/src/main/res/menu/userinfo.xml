@@ -1,0 +1,12 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.chuanzhe.chuanzhemap.MainActivity">
+    <item
+        android:id="@+id/action_userinfo"
+        android:orderInCategory="0"
+        app:icon="@mipmap/user"
+        app:showAsAction="always"
+        android:title="注销" />
+
+</menu>

@@ -7,8 +7,8 @@ import cn.bmob.v3.BmobObject;
  * yingke.github.io
  */
 public class Qiandao extends BmobObject{
-    private int cunhuoliang;
-    private int buhuoliang;
+    private Integer cunhuoliang;
+    private Integer buhuoliang;
     private String dingdanhao;
     private MyUser user;
     private PointItems items;

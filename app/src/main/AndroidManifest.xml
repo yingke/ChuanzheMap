@@ -16,9 +16,7 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <uses-feature android:name="android.hardware.camera" />
-    <uses-feature android:name="android.hardware.camera.autofocus" />
-
-    <!-- To auto-complete the email text field in the login form with the user's emails -->
+    <uses-feature android:name="android.hardware.camera.autofocus" /> <!-- To auto-complete the email text field in the login form with the user's emails -->
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
     <uses-permission android:name="android.permission.READ_PROFILE" />
     <uses-permission android:name="android.permission.READ_CONTACTS" />
@@ -30,21 +28,29 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <activity
+            android:name=".Main2Activity"
+            android:label="@string/title_activity_main2"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
+
         <meta-data
             android:name="com.amap.api.v2.apikey"
             android:value="5a023e3c8ebddab718c21e9b66a07dac" />
 
-        <activity android:name=".MainActivity">
+        <activity android:name=".MainActivity"
+           >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".login.LoginActivity"
-            android:theme="@style/Theme.Design.NoActionBar"/>
-        <activity android:name=".login.RegisteredActivity"
-            android:theme="@style/Theme.Design.NoActionBar"/>
+        <activity
+            android:name=".login.LoginActivity"
+            android:theme="@style/Theme.Design.NoActionBar" />
+        <activity
+            android:name=".login.RegisteredActivity"
+            android:theme="@style/Theme.Design.NoActionBar" />
         <activity android:name=".map.MainProject" />
 
         <service android:name="com.amap.api.location.APSService" />
@@ -62,7 +68,6 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/filepaths" />
         </provider>
-
     </application>
 
 </manifest>

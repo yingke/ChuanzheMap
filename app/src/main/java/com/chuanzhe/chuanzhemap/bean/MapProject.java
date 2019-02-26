@@ -10,29 +10,10 @@ public class MapProject extends BmobObject {
     private String Projectname;
     private String Projectmiaoshu;
     private MyUser myUser;
+    private Integer mincycle;
+    private Integer maxcycle;
 
 
-    public MyUser getMyUser() {
-        return myUser;
-    }
-
-    public void setMyUser(MyUser myUser) {
-        this.myUser = myUser;
-    }
-
-    public MapProject(String projectname, String projectmiaoshu) {
-        Projectname = projectname;
-        Projectmiaoshu = projectmiaoshu;
-    }
-
-    public MapProject() {
-    }
-
-    public MapProject(String projectname, String projectmiaoshu, MyUser myUser) {
-        Projectname = projectname;
-        Projectmiaoshu = projectmiaoshu;
-        this.myUser = myUser;
-    }
 
     public String getProjectname() {
         return Projectname;
@@ -48,5 +29,29 @@ public class MapProject extends BmobObject {
 
     public void setProjectmiaoshu(String projectmiaoshu) {
         Projectmiaoshu = projectmiaoshu;
+    }
+
+    public MyUser getMyUser() {
+        return myUser;
+    }
+
+    public void setMyUser(MyUser myUser) {
+        this.myUser = myUser;
+    }
+
+    public Integer getMincycle() {
+        return mincycle;
+    }
+
+    public void setMincycle(Integer mincycle) {
+        this.mincycle = mincycle;
+    }
+
+    public Integer getMaxcycle() {
+        return maxcycle;
+    }
+
+    public void setMaxcycle(Integer maxcycle) {
+        this.maxcycle = maxcycle;
     }
 }

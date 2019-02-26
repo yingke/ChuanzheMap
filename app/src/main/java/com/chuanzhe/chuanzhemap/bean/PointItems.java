@@ -23,7 +23,46 @@ public class PointItems extends BmobObject {
    private String zhouqi;
    private Integer isDelete;
    private Integer isfavorite;
+    private Integer buhuozhouqi;
 
+    private Integer positive;
+    private Integer normal;
+    private Integer lazy;
+
+    public Integer getPositive() {
+        return positive;
+    }
+
+    public void setPositive(Integer positive) {
+        this.positive = positive;
+    }
+
+    public Integer getNormal() {
+        return normal;
+    }
+
+    public void setNormal(Integer normal) {
+        this.normal = normal;
+    }
+
+    public Integer getLazy() {
+        return lazy;
+    }
+
+    public void setLazy(Integer lazy) {
+        this.lazy = lazy;
+    }
+
+
+
+
+    public Integer getBuhuozhouqi() {
+        return buhuozhouqi;
+    }
+
+    public void setBuhuozhouqi(Integer buhuozhouqi) {
+        this.buhuozhouqi = buhuozhouqi;
+    }
 
     public String getZhouqi() {
         return zhouqi;

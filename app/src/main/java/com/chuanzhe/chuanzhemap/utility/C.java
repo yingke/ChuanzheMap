@@ -26,6 +26,14 @@ public class C {
     public static String RED = "red";
     public static String BLACK = "black";
     public static  String GARY = "gray";
+    public static String SMARTZQ = "smartzq";
+    public static String MOSHI = "moshi";
+    public static int SHOUDONG = 4;
+    public static int LAZY = 3;
+    public static int NORMAL = 2;
+    public static int POSITIVE =1;
+
+
 
     public static long getDistanceTime(String str1, String str2) {
         DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -63,4 +71,13 @@ public class C {
             if (mNetworkInfo != null) {
                 return mNetworkInfo.isAvailable();          }
         }     return false;  }
+
+    public static boolean sameDate(Date d1, Date d2){
+        SimpleDateFormat fmt = new SimpleDateFormat("yyyyMMdd");
+        //fmt.setTimeZone(new TimeZone()); // 如果需要设置时间区域，可以在这里设置
+        return fmt.format(d1).equals(fmt.format(d2));
+    }
+
+
+
 }

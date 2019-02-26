@@ -1,5 +1,6 @@
 package com.chuanzhe.chuanzhemap.map;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
@@ -63,9 +64,10 @@ public class AddItemActivity extends AppCompatActivity {
     private String imgpath =null;
     private String action;
     private PointItems item;
-    private String zhouqi;
+    private Integer zhouqi;
     private String beizhu;
-    private  Boolean isadding = true;
+
+    private ProgressDialog progDialog = null;
 
 
     @Override
@@ -86,6 +88,7 @@ public class AddItemActivity extends AppCompatActivity {
     }
 
     private void initview() {
+        progDialog = new ProgressDialog(this);
         et_shopnum =findViewById(R.id.et_num);
         et_shouname =findViewById(R.id.et_shpomane);
         et_kehu =findViewById(R.id.et_kehu);
@@ -110,8 +113,11 @@ public class AddItemActivity extends AppCompatActivity {
 
             dizhi =item.getDizhi();
             et_addr.setText(dizhi);
-            zhouqi = item.getZhouqi();
-            et_zhouqi.setText(zhouqi);
+            zhouqi = item.getBuhuozhouqi();
+            if (zhouqi!=null){
+                et_zhouqi.setText(zhouqi+"");
+            }
+
             beizhu = item.getBeizhu();
             et_beizhu.setText(beizhu);
             latitude = item.getLatitude();
@@ -138,12 +144,13 @@ public class AddItemActivity extends AppCompatActivity {
     }
 
     public  void tosave(View view){
-        toast("添加");
+        showDialog();
+        btn_ok.setEnabled(false);
          unm = et_shopnum.getText().toString().trim();
          shopname = et_shouname.getText().toString().trim();
          kehu = et_kehu.getText().toString().trim();
          kehuphone = et_kehuphone.getText().toString().trim();
-         zhouqi = et_zhouqi.getText().toString().trim();
+         zhouqi = Integer.valueOf(et_zhouqi.getText().toString().trim());
          beizhu = et_beizhu.getText().toString().trim();
          userInfo = BmobUser.getCurrentUser(MyUser.class);
 
@@ -154,10 +161,9 @@ public class AddItemActivity extends AppCompatActivity {
              updataitem.setKehu(kehu);
              updataitem.setKehuphone(kehuphone);
              updataitem.setDizhi(dizhi);
-             Log.i("save",latitude+"");
              updataitem.setLatitude(latitude);
              updataitem.setLongitude(longitude);
-             updataitem.setZhouqi(zhouqi);
+             updataitem.setBuhuozhouqi(zhouqi);
              updataitem.setBeizhu(beizhu);
              updataitem.setAmyuser(userInfo);
              updataitem.setMapProject(objectid);
@@ -167,10 +173,13 @@ public class AddItemActivity extends AppCompatActivity {
                      @Override
                      public void done(BmobException e) {
                          if(e==null){
-
+                             dismissDialog();
+                             btn_ok.setEnabled(true);
                              finish();
                          }else{
                              Log.i("bmob","更新失败："+e.getMessage()+","+e.getErrorCode());
+                             dismissDialog();
+                             btn_ok.setEnabled(true);
                          }
                      }
                  });
@@ -187,15 +196,19 @@ public class AddItemActivity extends AppCompatActivity {
                                  public void done(BmobException e) {
                                      if(e==null){
                                          Log.i("bmob","更新成功");
+                                        dismissDialog();
 
                                          finish();
                                      }else{
+                                         dismissDialog();
                                          Log.i("bmob","更新失败："+e.getMessage()+","+e.getErrorCode());
                                      }
                                  }
                              });
 
                          }else{
+                            dismissDialog();
+                             btn_ok.setEnabled(true);
                              toast("上传文件失败：" + e.getMessage());
                          }
 
@@ -210,8 +223,6 @@ public class AddItemActivity extends AppCompatActivity {
 
          }else {
 
-             if (isadding){
-                 isadding = false;
                  if (TextUtils.isEmpty(imgpath)){
                      toast("请选择店铺图片");
                  }else if(TextUtils.isEmpty(unm)){
@@ -252,10 +263,9 @@ public class AddItemActivity extends AppCompatActivity {
                                  items.setKehu(kehu);
                                  items.setKehuphone(kehuphone);
                                  items.setDizhi(dizhi);
-                                 Log.i("save",latitude+"");
                                  items.setLatitude(latitude);
                                  items.setLongitude(longitude);
-                                items.setZhouqi(zhouqi);
+                                 items.setBuhuozhouqi(zhouqi);
                                  items.setImgurl(bmobFile.getFileUrl());
                                  items.setBeizhu(beizhu);
                                  items.setAmyuser(userInfo);
@@ -271,12 +281,16 @@ public class AddItemActivity extends AppCompatActivity {
                                      @Override
                                      public void done(String s, BmobException e) {
                                          if(e==null){
+                                             Intent mIntent = new Intent();
+                                             mIntent.putExtra("b",s);
+                                             // 设置结果，并进行传送
 
-                                             toast("添加数据成功，返回objectId为："+s);
-                                             isadding = true;
+                                             AddItemActivity.this.setResult(1024, mIntent);
+
+                                             toast("添加店铺成功");
                                              finish();
                                          }else{
-                                             isadding = true;
+                                             btn_ok.setEnabled(true);
                                              toast("创建数据失败：" + e.getMessage());
                                              Log.i("保存",e.getMessage());
                                          }
@@ -284,7 +298,6 @@ public class AddItemActivity extends AppCompatActivity {
                                  });
 
                              }else{
-                                 isadding = true;
                                  toast("上传文件失败：" + e.getMessage());
                              }
 
@@ -295,11 +308,7 @@ public class AddItemActivity extends AppCompatActivity {
                              // 返回的上传进度（百分比）
                          }
                      });
-
                  }
-
-             }
-
          }
 
         }
@@ -359,6 +368,27 @@ public class AddItemActivity extends AppCompatActivity {
         }
         return null;
     }
+
+    /**
+     * 显示进度条对话框
+     */
+    public void showDialog() {
+        progDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        progDialog.setIndeterminate(false);
+        progDialog.setCancelable(true);
+        progDialog.setMessage("加载中·····");
+        progDialog.show();
+    }
+
+    /**
+     * 隐藏进度条对话框
+     */
+    public void dismissDialog() {
+        if (progDialog != null) {
+            progDialog.dismiss();
+        }
+    }
+
 
 
 }
