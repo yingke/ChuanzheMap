@@ -75,7 +75,7 @@ public class MainActivity extends AppCompatActivity implements MyItemClickListen
         ActionBar actionBar =getSupportActionBar();
         actionBar.setTitle("项目列表");
 
-        Bmob.initialize(this, C.Bmob_APPID);
+
         isPermissionOK();
         myUser = BmobUser.getCurrentUser(MyUser.class);
         if(myUser == null){
@@ -203,7 +203,7 @@ public class MainActivity extends AppCompatActivity implements MyItemClickListen
             query.findObjects(new FindListener<MapProject>() {
                 @Override
                 public void done(List<MapProject> list, BmobException e) {
-                    Log.i("list","LLLL"+list.size());
+
                     prolist.addAll(list);
                     adapter.notifyDataSetChanged();
                 }

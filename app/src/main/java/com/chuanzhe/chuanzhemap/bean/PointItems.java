@@ -20,7 +20,7 @@ public class PointItems extends BmobObject {
     private  String qiandaotime;
    private Integer cunhuoliang;
    private Integer buhuoliang;
-   private String zhouqi;
+
    private Integer isDelete;
    private Integer isfavorite;
     private Integer buhuozhouqi;
@@ -55,7 +55,6 @@ public class PointItems extends BmobObject {
 
 
 
-
     public Integer getBuhuozhouqi() {
         return buhuozhouqi;
     }
@@ -64,13 +63,6 @@ public class PointItems extends BmobObject {
         this.buhuozhouqi = buhuozhouqi;
     }
 
-    public String getZhouqi() {
-        return zhouqi;
-    }
-
-    public void setZhouqi(String zhouqi) {
-        this.zhouqi = zhouqi;
-    }
 
     private String beizhu;
 
@@ -224,7 +216,6 @@ public class PointItems extends BmobObject {
                 ", qiandaotime='" + qiandaotime + '\'' +
                 ", cunhuoliang=" + cunhuoliang +
                 ", buhuoliang=" + buhuoliang +
-                ", zhouqi='" + zhouqi + '\'' +
                 ", isDelete=" + isDelete +
                 ", isfavorite=" + isfavorite +
                 ", beizhu='" + beizhu + '\'' +

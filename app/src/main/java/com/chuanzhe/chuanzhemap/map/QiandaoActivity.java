@@ -60,6 +60,66 @@ public class QiandaoActivity extends AppCompatActivity implements AMapLocationLi
 
     @OnClick(R.id.btn_qiandao) void qiandao(){
 
+       /* cunhuo = Integer.valueOf(et_cunhuo.getText().toString().trim());
+                buhuo = Integer.valueOf(et_buhuo.getText().toString().trim());
+                dingdanhao = et_dingdan.getText().toString().trim();
+
+                    Qiandao qiandao = new Qiandao();
+                    qiandao.setCunhuoliang(cunhuo);
+                    qiandao.setBuhuoliang(buhuo);
+                    qiandao.setDingdanhao(dingdanhao);
+                    qiandao.setUser(BmobUser.getCurrentUser(MyUser.class));
+                    qiandao.setItems(items);
+
+                    qiandao.save(new SaveListener<String>() {
+                        @Override
+                        public void done(String s, BmobException e) {
+                            id=s;
+                            if(e == null){
+                                PointItems pointItems = new PointItems();
+                                pointItems.setCunhuoliang(cunhuo);
+                                pointItems.setBuhuoliang(buhuo);
+                                SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");//设置日期格式
+                                String Currentdate = df.format(new Date());
+                                pointItems.setQiandaotime(Currentdate);
+                                pointItems.setIsfavorite(0);
+
+                                pointItems.update(items.getObjectId(), new UpdateListener() {
+                                    @Override
+                                    public void done(BmobException e) {
+                                        if(e==null){
+                                            toast("签到成功");
+
+                                            Intent intent = new Intent(QiandaoActivity.this,PointDetalActivity.class);
+                                            intent.putExtra("qdid",id);
+                                            setResult(0,intent);
+                                            finish();
+
+                                        }else {
+                                            Qiandao q= new Qiandao();
+                                            q.setObjectId(id);
+                                            q.delete(new UpdateListener() {
+                                                @Override
+                                                public void done(BmobException e) {
+                                                    isqiandaoing = true;
+
+                                                }
+                                            });
+                                        }
+                                    }
+                                });
+                            }else {
+                                isqiandaoing = true;
+                                toast("签到失败");
+                            }
+                        }
+                    });
+*/
+
+
+
+
+
         if (isqiandaoing){
             isqiandaoing = false;
             piontLatlng =new LatLng(items.getLatitude(),items.getLongitude());
@@ -92,7 +152,6 @@ public class QiandaoActivity extends AppCompatActivity implements AMapLocationLi
                                 pointItems.setBuhuoliang(buhuo);
                                 SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");//设置日期格式
                                 String Currentdate = df.format(new Date());
-
                                 pointItems.setQiandaotime(Currentdate);
                                 pointItems.setIsfavorite(0);
 
@@ -101,6 +160,10 @@ public class QiandaoActivity extends AppCompatActivity implements AMapLocationLi
                                     public void done(BmobException e) {
                                         if(e==null){
                                             toast("签到成功");
+
+                                            Intent intent = new Intent(QiandaoActivity.this,PointDetalActivity.class);
+                                            intent.putExtra("qdid",id);
+                                            setResult(0,intent);
                                             finish();
 
                                         }else {
@@ -135,19 +198,7 @@ public class QiandaoActivity extends AppCompatActivity implements AMapLocationLi
         setContentView(R.layout.activity_qiandao);
         ButterKnife.bind(this);
         Intent intent = getIntent();
-        Bundle b=intent.getExtras();
         items = (PointItems) intent.getSerializableExtra("items");
-//        q0 = (Qiandao) intent.getSerializableExtra("q0");
-//        issamedate = b.getBoolean("issamedate");
-//
-//        if (issamedate ){
-//            q1 = (Qiandao) intent.getSerializableExtra("q1");
-//
-//            et_buhuo.setText(q0.getBuhuoliang());
-//            et_cunhuo.setText(q0.getCunhuoliang());
-//            et_dingdan.setText(q0.getDingdanhao());
-//        }
-
 
         mLocationClient = new AMapLocationClient(getApplication());
 

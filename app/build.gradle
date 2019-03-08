@@ -1,14 +1,22 @@
 apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android-extensions'
+apply plugin: 'kotlin-android'
+apply plugin: 'bugly'
 
 def releaseTime() {
     return new Date().format("yyyy-MM-dd", TimeZone.getTimeZone("Asia/Shanghai"))
+}
+
+bugly {
+    appId = "9001390bed"
+    appKey = "70b9894c-2f11-4514-95e4-66f7777743d3"
 }
 
 android {
     compileSdkVersion 27
     defaultConfig {
         applicationId "com.chuanzhe.chuanzhemap"
-        minSdkVersion 24
+        minSdkVersion 23
         targetSdkVersion 27
         versionCode 1
         versionName "1.0"
@@ -52,4 +60,9 @@ dependencies {
     implementation 'com.amap.api:location:latest.integration'
     //如果你想应用能够兼容Android6.0，请添加此依赖(org.apache.http.legacy.jar)
     implementation 'cn.bmob.android:http-legacy:1.0'
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    implementation 'com.tencent.bugly:crashreport:latest.release'
+}
+repositories {
+    mavenCentral()
 }

@@ -16,13 +16,18 @@ import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -64,6 +69,7 @@ import cn.bmob.v3.BmobUser;
 import cn.bmob.v3.exception.BmobException;
 import cn.bmob.v3.listener.FindListener;
 import cn.bmob.v3.listener.QueryListener;
+import cn.bmob.v3.listener.UpdateListener;
 
 public class Main2Activity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener , LocationSource,
@@ -79,7 +85,7 @@ public class Main2Activity extends AppCompatActivity
     private AMapLocationClient mlocationClient;
     private AMapLocationClientOption mLocationOption;
     private MarkerOptions markerOption;
-    private int limit = 100; // 每页的数据是500条
+    private int limit = 500; // 每页的数据是500条
     private int curPage = 0; // 当前页的编号，从0开始
     private SimpleDateFormat df ;//设置日期格式
     private String Currentdate ;
@@ -98,14 +104,26 @@ public class Main2Activity extends AppCompatActivity
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
-            Bundle bundle = msg.getData();
-            ArrayList list = bundle.getParcelableArrayList("list");
-            addMarkers(0,list);
-            if (list.size() == limit){
-                querydata(id,curPage);
-            }else {
-              //  dismissDialog();
+
+            switch (msg.what){
+                case 0:
+                    //分页查询
+                    Bundle bundle = msg.getData();
+                    ArrayList list = bundle.getParcelableArrayList("list");
+                    addMarkers(0,list);
+                    if (list.size() == limit){
+                        querydata(id,curPage);
+                    }else {
+                        dismissmyDialog();
+                    }
+                    break;
+                case 1:
+                    //修改最大补货周期后 刷新当前project
+                    Bundle peob = msg.getData();
+                    project = (MapProject) peob.getSerializable("project");
+                    break;
             }
+
         }
     };
     @Override
@@ -148,15 +166,20 @@ public class Main2Activity extends AppCompatActivity
 
         switch (getsp(C.MOSHI)){
             case 0:
-                break;
-            case 1:
                 navigationView.getMenu().getItem(0).setChecked(true);
                 break;
-            case 2:
+            case 1:
                 navigationView.getMenu().getItem(1).setChecked(true);
                 break;
-            case 3:
+            case 2:
                 navigationView.getMenu().getItem(2).setChecked(true);
+                break;
+            case 3:
+                navigationView.getMenu().getItem(3).setChecked(true);
+                break;
+
+            case 4 :
+                navigationView.getMenu().getItem(0).setChecked(true);
                 break;
         }
 
@@ -287,6 +310,71 @@ public class Main2Activity extends AppCompatActivity
                 addall();
             }
         }else if(id == R.id.nav_share){
+
+                View v = LayoutInflater.from(Main2Activity.this).inflate(R.layout.maxcyle_layout,null);
+                final EditText et_max = (EditText)v.findViewById(R.id.et_maxcyle);
+
+                Button btn_ok = (Button)v.findViewById(R.id.but_maxok);
+                Button btn_quxiao = (Button)v.findViewById(R.id.btn_maxquxiao);
+
+                final AlertDialog dialog = new AlertDialog.Builder(Main2Activity.this) .create();
+                //创建
+                dialog.setTitle("设置最长补货周期");
+                dialog.setCancelable(false);
+                dialog.setView(v);//设置自定义view
+                dialog.show();
+
+                btn_ok.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        String max = et_max.getText().toString();
+
+                        if (TextUtils.isEmpty(max)){
+                            et_max.setError("周期不能为空");
+
+                        }else {
+                            final MapProject mapProject = new MapProject();
+
+
+                            mapProject.setMaxcycle(Integer.valueOf(max));
+
+                            mapProject.update(project.getObjectId(),new UpdateListener() {
+                                @Override
+                                public void done(BmobException e) {
+                                    dialog.dismiss();
+
+                                    BmobQuery<MapProject> query = new BmobQuery<>();
+                                    query.getObject(project.getObjectId(), new QueryListener<MapProject>() {
+                                        @Override
+                                        public void done(MapProject mapProject, BmobException e) {
+
+                                            Message msg = handler.obtainMessage();
+                                            Bundle bundle = new Bundle();
+                                            bundle.putSerializable("project",mapProject);
+                                            msg.setData(bundle);
+                                            msg.what = 1;
+                                            handler.sendMessage(msg);
+
+                                        }
+                                    });
+
+                                }
+                            });
+                        }
+
+
+                    }
+                });
+
+                btn_quxiao.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        dialog.dismiss();
+                    }
+                });
+
+
+
             Toast.makeText(this,"nav_share",Toast.LENGTH_LONG).show();
         }
 
@@ -456,7 +544,7 @@ public class Main2Activity extends AppCompatActivity
 
 
     private void  querydata(String s , int Page){
-        //showDialog();
+        showmyDialog();
         BmobQuery<PointItems> pointItemBmobQuery = new BmobQuery<PointItems>();
         pointItemBmobQuery.addWhereEqualTo("mapProject",s);
         pointItemBmobQuery.setLimit(limit);
@@ -471,6 +559,7 @@ public class Main2Activity extends AppCompatActivity
                     Bundle bundle = new Bundle();
                     bundle.putParcelableArrayList("list",(ArrayList)list);
                     msg.setData(bundle);
+                    msg.what = 0;
                     handler.sendMessage(msg);
                     curPage ++;
                 }else{
@@ -491,9 +580,11 @@ public class Main2Activity extends AppCompatActivity
             }
         }else {
             for (int i = 0; i < object.size(); i++) {
+
                 PointItems p = object.get(i);
-                alllist.add(p);
                 getmarkinfo(p);
+                alllist.add(p);
+
             }
         }
 
@@ -513,7 +604,7 @@ public class Main2Activity extends AppCompatActivity
         Integer buhuo = options.getBuhuoliang();
         String qiaodaotime = options.getQiandaotime();
         String UpdatedAt = options.getUpdatedAt();
-        String zhouqi = options.getZhouqi();
+      //  String zhouqi = options.getZhouqi();
         Integer buhuozhouqi =options.getBuhuozhouqi();
 
         Integer positive = options.getPositive();
@@ -543,31 +634,46 @@ public class Main2Activity extends AppCompatActivity
                 if (f ==0){
 
                     switch (m) {
+                        case 0:
+                            if (buhuozhouqi != null && buhuozhouqi > 0) {
+                               color = getZhouqi(date, buhuozhouqi);
+                            }else {
+                                color = getZhouqi(date,30);
+                            }
+
+                            break;
                         case 4:
-                            color = initcolor(date,buhuozhouqi);
+                            if (buhuozhouqi != null && buhuozhouqi > 0) {
+                                color = getZhouqi(date, buhuozhouqi);
+                            }else {
+                                color = getZhouqi(date,30);
+                            }
                             break;
                         case 1:
-                            if (positive<0){
-                                color = initcolor(date,buhuozhouqi);
-                            }else {
+                            if (positive!=null &&positive>0){
                                 color = initcolor(date,positive);
+                            }else {
+                                color = initcolor(date,buhuozhouqi);
                             }
 
                             break;
                         case 2:
-                            if (normal<0){
-                                color = initcolor(date,buhuozhouqi);
-                            }else {
+                            if (normal!=null &&normal>0){
                                 color = initcolor(date,normal);
+
+                            }else {
+                                color = initcolor(date,buhuozhouqi);
                             }
 
                             break;
                         case 3:
-                            if (lat<0){
-                                color = initcolor(date,buhuozhouqi);
-                            }else {
+                            if (lazy!=null &&lazy>0){
                                 color = initcolor(date,lazy);
+
+                            }else {
+                                color = initcolor(date,buhuozhouqi);
                             }
+
 
 
                             break;
@@ -653,11 +759,14 @@ public class Main2Activity extends AppCompatActivity
 
     private void clearMarkers() {
         //获取地图上所有Marker
+
         List<Marker> mapScreenMarkers = aMap.getMapScreenMarkers();
+
         for (int i = 0; i < mapScreenMarkers.size(); i++) {
             Marker marker = mapScreenMarkers.get(i);
             if (marker.getObject() instanceof PointItems) {
                 marker.remove();//移除当前Marker
+
             }
         }
         aMap.invalidate();//刷新地图
@@ -671,6 +780,7 @@ public class Main2Activity extends AppCompatActivity
                 addMarkers(1,alllist);
             }
         }.start();
+       // addMarkers(1,alllist);
     }
 
     public void addpoint(){
@@ -728,6 +838,33 @@ public class Main2Activity extends AppCompatActivity
     private void changeCamera(CameraUpdate update) {
 
         aMap.moveCamera(update);
+    }
+
+    private void toast(String s){
+        Toast.makeText(Main2Activity.this,s, Toast.LENGTH_SHORT).show();
+
+    }
+
+
+
+    /**
+     * 显示进度条对话框
+     */
+    public void showmyDialog() {
+        progDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        progDialog.setIndeterminate(false);
+        progDialog.setCancelable(true);
+        progDialog.setMessage("加载中·····");
+        progDialog.show();
+    }
+
+    /**
+     * 隐藏进度条对话框
+     */
+    public void dismissmyDialog() {
+        if (progDialog != null) {
+            progDialog.dismiss();
+        }
     }
 
 

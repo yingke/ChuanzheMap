@@ -3,7 +3,6 @@ package com.chuanzhe.chuanzhemap.map;
 import android.annotation.SuppressLint;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.icu.text.SimpleDateFormat;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -43,9 +42,9 @@ import com.chuanzhe.chuanzhemap.bean.Qiandao;
 import com.chuanzhe.chuanzhemap.utility.C;
 import com.chuanzhe.chuanzhemap.utility.DownloadImageTask;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 
 import butterknife.BindView;
@@ -56,7 +55,6 @@ import cn.bmob.v3.datatype.BmobPointer;
 import cn.bmob.v3.exception.BmobException;
 import cn.bmob.v3.listener.FindListener;
 import cn.bmob.v3.listener.QueryListener;
-import cn.bmob.v3.listener.SaveListener;
 import cn.bmob.v3.listener.UpdateListener;
 
 public class PointDetalActivity extends AppCompatActivity implements AMapLocationListener {
@@ -88,6 +86,8 @@ public class PointDetalActivity extends AppCompatActivity implements AMapLocatio
     private Integer buhuo = 0;
     private String dingdanhao;
 
+    private int qiandaoCode = 0;
+
 
     @BindView(R.id.detal_rec) RecyclerView recyclerView;
     private DetalPointAdapter adapter;
@@ -99,10 +99,23 @@ public class PointDetalActivity extends AppCompatActivity implements AMapLocatio
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
-            Bundle bundle = msg.getData();
-            ArrayList list = bundle.getParcelableArrayList("list");
-            qiandaoList.addAll(list);
-            adapter.notifyDataSetChanged();
+            switch (msg.what){
+                case 0:
+                    Bundle bundle = msg.getData();
+                    ArrayList list = bundle.getParcelableArrayList("list");
+                    qiandaoList.addAll(list);
+                    adapter.notifyDataSetChanged();
+                    //setsmartcyle(qiandaoList);
+
+                    break;
+                case 1:
+                    Bundle b = msg.getData();
+                    Qiandao qiandao =(Qiandao)b.getSerializable("p");
+                    qiandaoList.add(qiandao);
+                    adapter.notifyDataSetChanged();
+                    break;
+            }
+
 
         }
     };
@@ -134,10 +147,6 @@ public class PointDetalActivity extends AppCompatActivity implements AMapLocatio
             }
         });
 
-
-
-
-      //  getDetal(items);
     }
 
     @Override
@@ -219,8 +228,40 @@ public class PointDetalActivity extends AppCompatActivity implements AMapLocatio
 
 */
 
-        showDialog();
+        if(qiandaoList!=null && qiandaoList.size()>=1){
+            if (qiandaoList.get(0).getUpdatedAt().indexOf(getCurrentdate())==-1){
+                //同一天没有签到
+                Intent intent = new Intent();
+                Bundle bundle = new Bundle();
+                bundle.putSerializable("items",items);
+                intent.putExtras(bundle);
+                intent.setClass(PointDetalActivity.this, QiandaoActivity.class);
+//                startActivity(intent);
+                startActivityForResult(intent,qiandaoCode);
+            }else {
+               showDialog1(qiandaoList.get(0));
+            }
+        }else {
+            Intent intent = new Intent();
+            Bundle bundle = new Bundle();
+            bundle.putSerializable("items",items);
+            intent.putExtras(bundle);
+            intent.setClass(PointDetalActivity.this, QiandaoActivity.class);
+//                startActivity(intent);
+            startActivityForResult(intent,qiandaoCode);
+        }
+    }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (data!=null) switch (requestCode) {
+            case 0:
+              /* String id =  data.getStringExtra("qdid");
+                getqiaodaobyid(id);*/
+                getDetal(items);
+                break;
+        }
     }
 
     private void initview(PointItems items) {
@@ -238,8 +279,6 @@ public class PointDetalActivity extends AppCompatActivity implements AMapLocatio
         });
         if (items.getBuhuozhouqi() !=null && items.getBuhuozhouqi()!= 0){
             tv_iszs.setText("周期："+items.getBuhuozhouqi());
-        }else if(items.getZhouqi()!=null){
-            tv_iszs.setText("周期："+items.getZhouqi());
         }
         tv_vip.setText("备注："+items.getBeizhu());
 
@@ -250,6 +289,8 @@ public class PointDetalActivity extends AppCompatActivity implements AMapLocatio
 
     }
 
+
+    //获取签到数据
     private void getDetal(PointItems items) {
         qiandaoList.clear();
         BmobQuery<Qiandao> query = new BmobQuery<Qiandao>();
@@ -260,18 +301,17 @@ public class PointDetalActivity extends AppCompatActivity implements AMapLocatio
             @Override
             public void done(List<Qiandao> list, BmobException e) {
 
-
-
                 Message msg = handler.obtainMessage();
                 Bundle bundle = new Bundle();
                 bundle.putParcelableArrayList("list",(ArrayList)list);
+                msg.what = 0;
                 msg.setData(bundle);
                 handler.sendMessage(msg);
             }
         });
 
     }
-
+ //查看大图
     public void Bigimg(){
         View v = LayoutInflater.from(PointDetalActivity.this).inflate(R.layout.bigimg_layout,null);
 
@@ -286,7 +326,7 @@ public class PointDetalActivity extends AppCompatActivity implements AMapLocatio
     @Override
     protected void onResume() {
         super.onResume();
-        getDetal(items);
+      //  getDetal(items);
 
 
     }
@@ -336,7 +376,7 @@ public class PointDetalActivity extends AppCompatActivity implements AMapLocatio
     }
 
 
-
+    //获取当前时间
     public String getCurrentdate(){
         Calendar calendar= Calendar.getInstance();
         SimpleDateFormat dateFormat= new SimpleDateFormat("yyyy-MM-dd");
@@ -345,161 +385,48 @@ public class PointDetalActivity extends AppCompatActivity implements AMapLocatio
 
     }
 
-    public void showDialog(){
-        View v = LayoutInflater.from(PointDetalActivity.this).inflate(R.layout.activity_qiandao,null);
-        final AlertDialog dialog = new AlertDialog.Builder(this).create();
-        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-
-        dialog.setCancelable(true);
-        dialog.setView(v);
-        dialog.show();
-        Window window = dialog.getWindow();
-        window.getDecorView().setPadding(0, 150, 0, 0);
-        window.setGravity(Gravity.CENTER);
-
-        WindowManager.LayoutParams lp = window.getAttributes();
-        lp.width = WindowManager.LayoutParams.FILL_PARENT;
-        lp.height = WindowManager.LayoutParams.FILL_PARENT;
-        window.setAttributes(lp);
-
-        EditText et_buhuo = v.findViewById(R.id.et_buhuoliang);
-
-        EditText et_cunhuo = v.findViewById(R.id.et_cunhuoliang);
-
-        EditText et_dingdan = v.findViewById(R.id.et_dingdanhao);
-
-        Button btn_qiandao = v.findViewById(R.id.btn_qiandao);
-
-
-        cunhuo = Integer.valueOf(et_cunhuo.getText().toString().trim());
-        buhuo = Integer.valueOf(et_buhuo.getText().toString().trim());
-        dingdanhao = et_dingdan.getText().toString().trim();
-
-        btn_qiandao.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (isqiandaoing){
-                    isqiandaoing = false;
-                    piontLatlng =new LatLng(items.getLatitude(),items.getLongitude());
-                    currlatlon = new LatLng(latitude,longitude);
-                    Float juli =  AMapUtils.calculateLineDistance(piontLatlng,currlatlon);
-                    Log.i("距离：","=="+juli);
-                    if (juli>500.00){
-                        isqiandaoing = true;
-                        toast("请到店铺附近签到");
-                    }else {
-                        Qiandao qiandao = new Qiandao();
-                        qiandao.setCunhuoliang(cunhuo);
-                        qiandao.setBuhuoliang(buhuo);
-                        qiandao.setDingdanhao(dingdanhao);
-                        qiandao.setUser(BmobUser.getCurrentUser(MyUser.class));
-                        qiandao.setItems(items);
-
-                        qiandao.save(new SaveListener<String>() {
-                            @Override
-                            public void done(String s, BmobException e) {
-                                id=s;
-                                if(e == null){
-                                    PointItems pointItems = new PointItems();
-                                    pointItems.setCunhuoliang(cunhuo);
-                                    pointItems.setBuhuoliang(buhuo);
-                                    java.text.SimpleDateFormat df = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss");//设置日期格式
-                                    String Currentdate = df.format(new Date());
-
-                                    pointItems.setQiandaotime(Currentdate);
-                                    pointItems.setIsfavorite(0);
-
-                                    pointItems.update(items.getObjectId(), new UpdateListener() {
-                                        @Override
-                                        public void done(BmobException e) {
-                                            if(e==null){
-                                                toast("签到成功");
-                                                finish();
-
-                                            }else {
-                                                Qiandao q= new Qiandao();
-                                                q.setObjectId(id);
-                                                q.delete(new UpdateListener() {
-                                                    @Override
-                                                    public void done(BmobException e) {
-                                                        isqiandaoing = true;
-
-                                                    }
-                                                });
-                                            }
-                                        }
-                                    });
-                                }else {
-                                    isqiandaoing = true;
-                                    toast("签到失败");
-                                }
-                            }
-                        });
-
-                    }
-
-                }
-            }
-        });
-
-
-
-
-
-    }
-
-
 
     public void showDialog1(final Qiandao qiandao){
         View v = LayoutInflater.from(PointDetalActivity.this).inflate(R.layout.activity_qiandao,null);
         final AlertDialog dialog = new AlertDialog.Builder(this).create();
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-
         dialog.setCancelable(true);
         dialog.setView(v);
         dialog.show();
         Window window = dialog.getWindow();
         window.getDecorView().setPadding(0, 150, 0, 0);
         window.setGravity(Gravity.CENTER);
-
         WindowManager.LayoutParams lp = window.getAttributes();
         lp.width = WindowManager.LayoutParams.FILL_PARENT;
         lp.height = WindowManager.LayoutParams.FILL_PARENT;
         window.setAttributes(lp);
 
         final EditText et_buhuo = v.findViewById(R.id.et_buhuoliang);
-
         final EditText et_cunhuo= v.findViewById(R.id.et_cunhuoliang);
-
         final EditText et_dingdan = v.findViewById(R.id.et_dingdanhao);
-
         Button btn_qiandao = v.findViewById(R.id.btn_qiandao);
 
-        et_buhuo.setText(qiandao.getBuhuoliang());
-        et_cunhuo.setText(qiandao.getCunhuoliang());
+        et_buhuo.setText(String.valueOf(qiandao.getBuhuoliang()));
+        et_cunhuo.setText(String.valueOf(qiandao.getCunhuoliang()));
         et_dingdan.setText(qiandao.getDingdanhao());
-
-
 
         btn_qiandao.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                cunhuo = Integer.valueOf(et_cunhuo.getText().toString().trim());
-                buhuo = Integer.valueOf(et_buhuo.getText().toString().trim());
-                dingdanhao = et_dingdan.getText().toString().trim();
+                Integer cunhuo = Integer.valueOf(et_cunhuo.getText().toString().trim());
+                Integer buhuo = Integer.valueOf(et_buhuo.getText().toString().trim());
+                String dingdanhao = et_dingdan.getText().toString().trim();
 
                 Qiandao qiandao1 = new Qiandao();
                 qiandao1.setBuhuoliang(buhuo);
                 qiandao1.setCunhuoliang(cunhuo);
                 qiandao1.setDingdanhao(dingdanhao);
 
-                qiandao.update(qiandao.getObjectId(), new UpdateListener() {
+                qiandao1.update(qiandao.getObjectId(), new UpdateListener() {
                     @Override
                     public void done(BmobException e) {
                         if(e==null){
-                            toast("成功");
-                            finish();
-
+                            getDetal(items);
                         }
                     }
                 });
@@ -583,4 +510,75 @@ public class PointDetalActivity extends AppCompatActivity implements AMapLocatio
         mLocationClient.onDestroy();
     }
 
+
+    public  void getqiaodaobyid(String id){
+        BmobQuery<Qiandao> bmobQuery = new BmobQuery<Qiandao>();
+        bmobQuery.getObject(id, new QueryListener<Qiandao>() {
+            @Override
+            public void done(Qiandao q,BmobException e) {
+                if(e==null){
+                    Message msg = handler.obtainMessage();
+                    Bundle bundle = new Bundle();
+                    bundle.putSerializable("q",q);
+                    msg.what = 1;
+                    msg.setData(bundle);
+                    handler.sendMessage(msg);
+                }else{
+                    toast("查询失败：" + e.getMessage());
+                }
+            }
+        });
+
+    }
+
+    public  void setsmartcyle(List<Qiandao> list){
+        Integer  Dailysales;
+        if (list.size()>=2){
+            Qiandao q0 = list.get(0);
+            Qiandao q1 = list.get(1);
+            Integer cunhuoliang = q0.getCunhuoliang();
+            Integer last = (q0.getBuhuoliang()+q1.getCunhuoliang())-cunhuoliang;
+
+            Long buhuozhouqi = C.getDistanceTime(q0.getUpdatedAt(),q1.getUpdatedAt());
+
+            if (buhuozhouqi!=0){
+               Dailysales = last/(buhuozhouqi.intValue());
+            }else {
+                Dailysales = last;
+            }
+
+            Double positive = getcycle(cunhuoliang,Dailysales,0.4,12);
+            Double normal = getcycle(cunhuoliang,Dailysales,0.5,10);
+            Double lazy = getcycle(cunhuoliang,Dailysales,0.6,8);
+
+            PointItems pointItems = new PointItems();
+            pointItems.setPositive(positive.intValue());
+            pointItems.setNormal(normal.intValue());
+            pointItems.setLazy(last.intValue());
+
+            pointItems.update(items.getObjectId(), new UpdateListener() {
+                @Override
+                public void done(BmobException e) {
+
+                }
+            });
+            Log.d("last",last+"");
+            Log.d("buhuozhouqi",buhuozhouqi+"");
+            Log.d("Dailysales",Dailysales+"");
+
+            Log.d("positive",positive.intValue()+"");
+            Log.d("normal",normal.intValue()+"");
+            Log.d("lazy",lazy.intValue()+"");
+
+        }
+    }
+
+    public double getcycle(Integer cunhuo, Integer sales, double arg1, Integer arg2) {
+        if (cunhuo*(1-sales)<arg2){
+            return (cunhuo - arg2)/sales;
+        }else {
+            return  (cunhuo*arg1)/sales;
+        }
+
+    }
 }

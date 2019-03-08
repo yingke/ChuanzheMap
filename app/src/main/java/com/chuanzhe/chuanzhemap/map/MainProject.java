@@ -186,7 +186,7 @@ public class MainProject extends AppCompatActivity  implements LocationSource,
         Integer buhuo = options.getBuhuoliang();
         String qiaodaotime = options.getQiandaotime();
         String UpdatedAt = options.getUpdatedAt();
-        String zhouqi = options.getZhouqi();
+
         Integer buhuozhouqi =options.getBuhuozhouqi();
         d = options.getIsDelete();
         f =options.getIsfavorite();
