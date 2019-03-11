@@ -219,15 +219,6 @@ public class PointDetalActivity extends AppCompatActivity implements AMapLocatio
     }
     public  void qiandao(View view){
 
-        /*Intent intent = new Intent();
-        Bundle bundle = new Bundle();
-        bundle.putSerializable("items",items);
-        intent.putExtras(bundle);
-        intent.setClass(PointDetalActivity.this, QiandaoActivity.class);
-//        startActivity(intent);
-
-*/
-
         if(qiandaoList!=null && qiandaoList.size()>=1){
             if (qiandaoList.get(0).getUpdatedAt().indexOf(getCurrentdate())==-1){
                 //同一天没有签到
@@ -405,6 +396,8 @@ public class PointDetalActivity extends AppCompatActivity implements AMapLocatio
         final EditText et_cunhuo= v.findViewById(R.id.et_cunhuoliang);
         final EditText et_dingdan = v.findViewById(R.id.et_dingdanhao);
         Button btn_qiandao = v.findViewById(R.id.btn_qiandao);
+        Button btn_quxiao = v.findViewById(R.id.btn_QD_quxiao);
+
 
         et_buhuo.setText(String.valueOf(qiandao.getBuhuoliang()));
         et_cunhuo.setText(String.valueOf(qiandao.getCunhuoliang()));
@@ -427,9 +420,17 @@ public class PointDetalActivity extends AppCompatActivity implements AMapLocatio
                     public void done(BmobException e) {
                         if(e==null){
                             getDetal(items);
+                            dialog.dismiss();
                         }
                     }
                 });
+            }
+        });
+
+        btn_quxiao.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
             }
         });
 

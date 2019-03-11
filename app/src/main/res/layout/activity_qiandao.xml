@@ -84,13 +84,21 @@
         android:layout_width="233dp"
         android:layout_height="42dp"
         android:layout_marginTop="56dp"
-        android:text="签到"
+        android:text="确认修改"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/et_cunhuoliang"
         tools:ignore="MissingConstraints" />
 
-
+    <Button
+        android:id="@+id/btn_QD_quxiao"
+        style="@style/btn_style"
+        android:layout_width="233dp"
+        android:layout_height="42dp"
+        android:layout_marginTop="24dp"
+        android:text="@string/login_quxiao"
+        app:layout_constraintStart_toStartOf="@+id/btn_qiandao"
+        app:layout_constraintTop_toBottomOf="@+id/btn_qiandao" />
 
 
 </android.support.constraint.ConstraintLayout>

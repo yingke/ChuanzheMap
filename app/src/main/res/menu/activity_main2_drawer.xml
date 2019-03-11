@@ -12,15 +12,15 @@
         <item
             android:id="@+id/nav_camera"
             android:icon="@drawable/ic_directions_bike_black_24dp"
-            android:title="积极补货模式" />
+            android:title="智能积极模式" />
         <item
             android:id="@+id/nav_gallery"
             android:icon="@drawable/ic_directions_run_black_24dp"
-            android:title="普通补货模式" />
+            android:title="智能普通模式" />
         <item
             android:id="@+id/nav_slideshow"
             android:icon="@drawable/ic_directions_walk_black_24dp"
-            android:title="懒惰补货模式" />
+            android:title="智能懒惰模式" />
 
     </group>
 
@@ -28,7 +28,7 @@
         <menu>
             <item
                 android:id="@+id/nav_share"
-                android:icon="@drawable/ic_menu_share"
+                android:icon="@drawable/ic_mode_edit_black_24dp"
                 android:title="最长补货周期设置" />
             <!--<item-->
                 <!--android:id="@+id/nav_send"-->

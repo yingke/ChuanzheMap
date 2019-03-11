@@ -81,7 +81,7 @@ public class Main2Activity extends AppCompatActivity
     private ProgressDialog progDialog = null;
     private GeocodeSearch geocoderSearch;
     private String id;
-    private LocationSource.OnLocationChangedListener mListener;
+    private OnLocationChangedListener mListener;
     private AMapLocationClient mlocationClient;
     private AMapLocationClientOption mLocationOption;
     private MarkerOptions markerOption;
@@ -133,7 +133,6 @@ public class Main2Activity extends AppCompatActivity
         initview();
         mapView.onCreate(savedInstanceState);
         ActionBar actionBar =getSupportActionBar();
-        mapView.onCreate(savedInstanceState);
         project = (MapProject) getIntent().getSerializableExtra("id");
         actionBar.setTitle(project.getProjectname());
         id = project.getObjectId();
@@ -186,12 +185,10 @@ public class Main2Activity extends AppCompatActivity
         View headerLayout =  navigationView.getHeaderView(0);
         TextView t = headerLayout.findViewById(R.id.headername);
         t.setText(BmobUser.getCurrentUser(MyUser.class).getUsername());
-
-
-
         progDialog = new ProgressDialog(this);
         mapView = findViewById(R.id.map);
         setmap();
+
 
     }
 
@@ -288,31 +285,43 @@ public class Main2Activity extends AppCompatActivity
         if (id == R.id.nav_send){
             if (setsp(C.SHOUDONG)){
                 clearMarkers();
-                addall();
+                curPage = 0;
+                alllist  = new ArrayList<>();
+                querydata(project.getObjectId() , curPage);
             }
 
         }else if (id == R.id.nav_camera) {
             if(setsp(C.POSITIVE)){
                clearMarkers();
-               addall();
+                curPage = 0;
+                alllist  = new ArrayList<>();
+                querydata(project.getObjectId() , curPage);
 
             }
 
         } else if (id == R.id.nav_gallery) {
             if(setsp(C.NORMAL)){
                 clearMarkers();
-                addall();
+                curPage = 0;
+                alllist  = new ArrayList<>();
+                querydata(project.getObjectId() , curPage);
             }
 
         } else if (id == R.id.nav_slideshow) {
             if(setsp(C.LAZY)){
                 clearMarkers();
-                addall();
+                curPage = 0;
+                alllist  = new ArrayList<>();
+                querydata(project.getObjectId() , curPage);
             }
         }else if(id == R.id.nav_share){
 
                 View v = LayoutInflater.from(Main2Activity.this).inflate(R.layout.maxcyle_layout,null);
                 final EditText et_max = (EditText)v.findViewById(R.id.et_maxcyle);
+                if (project.getMaxcycle()!=null){
+                    et_max.setText(String.valueOf(project.getMaxcycle()));
+                }
+
 
                 Button btn_ok = (Button)v.findViewById(R.id.but_maxok);
                 Button btn_quxiao = (Button)v.findViewById(R.id.btn_maxquxiao);
@@ -392,6 +401,13 @@ public class Main2Activity extends AppCompatActivity
             CameraUpdate mCameraUpdate = CameraUpdateFactory.zoomTo(16);
             aMap.moveCamera(mCameraUpdate);
         }
+        if(aMap == null){
+            // 显示地图
+            aMap = mapView.getMap();
+            CameraUpdate mCameraUpdate = CameraUpdateFactory.zoomTo(16);
+            aMap.moveCamera(mCameraUpdate);
+
+        }
         aMap.getUiSettings().setZoomPosition(AMapOptions.ZOOM_POSITION_RIGHT_CENTER);//设置缩放按钮去位置
         MyLocationStyle myLocationStyle = new MyLocationStyle();
         myLocationStyle.myLocationType(MyLocationStyle.LOCATION_TYPE_LOCATE) ;//定位一次，且将视角移动到地图中心点。
@@ -399,18 +415,42 @@ public class Main2Activity extends AppCompatActivity
                 .fromResource(R.drawable.gps_point));// 设置小蓝点的图标*/
         myLocationStyle.strokeColor(Color.argb(0, 0, 0, 0));// 设置圆形的边框颜色
         myLocationStyle.radiusFillColor(Color.argb(0, 0, 0, 0));// 设置圆形的填充颜色
-        // myLocationStyle.anchor(int,int)//设置小蓝点的锚点
+
         myLocationStyle.strokeWidth(1.0f);// 设置圆形的边框粗细
         aMap.setMyLocationStyle(myLocationStyle);
         aMap.setLocationSource(this);// 设置定位监听
+        aMap.getUiSettings().setMyLocationButtonEnabled(true);// 设置默认定位按钮是否显示
+        aMap.setMyLocationEnabled(true);// 设置为true表示显示定位层并可触发定位，false表示隐藏定位层并不可触发定位，默认是false
+        // aMap.setMyLocationType()
+
         aMap.setOnMarkerClickListener(this);
         aMap.setOnMapClickListener(this);
         aMap.setOnInfoWindowClickListener(this);
-        aMap.getUiSettings().setMyLocationButtonEnabled(true);// 设置默认定位按钮是否显示
-        aMap.setMyLocationEnabled(true);// 设置为true表示显示定位层并可触发定位，false表示隐藏定位层并不可触发定位，默认是false
+
         geocoderSearch = new GeocodeSearch(this);
         geocoderSearch.setOnGeocodeSearchListener(this);
         markerOption = new MarkerOptions();
+
+//        MyLocationStyle myLocationStyle = new MyLocationStyle();
+//        aMap.getUiSettings().setZoomPosition(AMapOptions.ZOOM_POSITION_RIGHT_CENTER);//设置缩放按钮去位置
+//
+//        myLocationStyle.myLocationType(MyLocationStyle.LOCATION_TYPE_LOCATE) ;//定位一次，且将视角移动到地图中心点。
+//        myLocationStyle.myLocationIcon(BitmapDescriptorFactory
+//                .fromResource(R.drawable.gps_point));// 设置小蓝点的图标*/
+//        myLocationStyle.strokeColor(Color.argb(0, 0, 0, 0));// 设置圆形的边框颜色
+//        myLocationStyle.radiusFillColor(Color.argb(0, 0, 0, 0));// 设置圆形的填充颜色
+//        // myLocationStyle.anchor(int,int)//设置小蓝点的锚点
+//        myLocationStyle.strokeWidth(1.0f);// 设置圆形的边框粗细
+//        aMap.setMyLocationStyle(myLocationStyle);
+//        aMap.setLocationSource(this);// 设置定位监听
+//        aMap.setOnMarkerClickListener(this);
+//        aMap.setOnMapClickListener(this);
+//        aMap.setOnInfoWindowClickListener(this);
+//        aMap.getUiSettings().setMyLocationButtonEnabled(true);// 设置默认定位按钮是否显示
+//        aMap.setMyLocationEnabled(true);// 设置为true表示显示定位层并可触发定位，false表示隐藏定位层并不可触发定位，默认是false
+//        geocoderSearch = new GeocodeSearch(this);
+//        geocoderSearch.setOnGeocodeSearchListener(this);
+//        markerOption = new MarkerOptions();
     }
 
     @Override
@@ -507,10 +547,7 @@ public class Main2Activity extends AppCompatActivity
         super.onResume();
         mapView.onResume();
 
-        if (Pointid ==null){
-
-        }else {
-
+        if (Pointid !=null){
             BmobQuery<PointItems> query = new BmobQuery<PointItems>();
             query.getObject(Pointid, new QueryListener<PointItems>() {
                 @Override
@@ -519,7 +556,6 @@ public class Main2Activity extends AppCompatActivity
                 }
             });
         }
-
     }
 
     @Override
@@ -619,10 +655,10 @@ public class Main2Activity extends AppCompatActivity
         }else {
             if (null == qiaodaotime){
                 date = C.getDistanceTime(UpdatedAt,Currentdate);
-                s  =UpdatedAt.substring(0,10)+","+cunhuo+","+buhuo;
+                s  =UpdatedAt.substring(0,10)+","+buhuo+","+cunhuo;
             }else {
                 date = C.getDistanceTime(qiaodaotime,Currentdate);
-                s  = qiaodaotime.substring(0,10)+","+cunhuo+","+buhuo;
+                s  = qiaodaotime.substring(0,10)+","+buhuo+","+cunhuo;
             }
             if (d ==null ){
                 d =0;
