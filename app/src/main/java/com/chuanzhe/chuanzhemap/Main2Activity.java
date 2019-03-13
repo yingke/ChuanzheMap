@@ -121,6 +121,11 @@ public class Main2Activity extends AppCompatActivity
                     //修改最大补货周期后 刷新当前project
                     Bundle peob = msg.getData();
                     project = (MapProject) peob.getSerializable("project");
+
+                    clearMarkers();
+                    curPage = 0;
+                    alllist  = new ArrayList<>();
+                    querydata(project.getObjectId() , curPage);
                     break;
             }
 
@@ -382,9 +387,6 @@ public class Main2Activity extends AppCompatActivity
                     }
                 });
 
-
-
-            Toast.makeText(this,"nav_share",Toast.LENGTH_LONG).show();
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -395,12 +397,7 @@ public class Main2Activity extends AppCompatActivity
 
 
     private void setmap() {
-        if(aMap == null){
-            // 显示地图
-            aMap = mapView.getMap();
-            CameraUpdate mCameraUpdate = CameraUpdateFactory.zoomTo(16);
-            aMap.moveCamera(mCameraUpdate);
-        }
+
         if(aMap == null){
             // 显示地图
             aMap = mapView.getMap();
@@ -431,26 +428,6 @@ public class Main2Activity extends AppCompatActivity
         geocoderSearch.setOnGeocodeSearchListener(this);
         markerOption = new MarkerOptions();
 
-//        MyLocationStyle myLocationStyle = new MyLocationStyle();
-//        aMap.getUiSettings().setZoomPosition(AMapOptions.ZOOM_POSITION_RIGHT_CENTER);//设置缩放按钮去位置
-//
-//        myLocationStyle.myLocationType(MyLocationStyle.LOCATION_TYPE_LOCATE) ;//定位一次，且将视角移动到地图中心点。
-//        myLocationStyle.myLocationIcon(BitmapDescriptorFactory
-//                .fromResource(R.drawable.gps_point));// 设置小蓝点的图标*/
-//        myLocationStyle.strokeColor(Color.argb(0, 0, 0, 0));// 设置圆形的边框颜色
-//        myLocationStyle.radiusFillColor(Color.argb(0, 0, 0, 0));// 设置圆形的填充颜色
-//        // myLocationStyle.anchor(int,int)//设置小蓝点的锚点
-//        myLocationStyle.strokeWidth(1.0f);// 设置圆形的边框粗细
-//        aMap.setMyLocationStyle(myLocationStyle);
-//        aMap.setLocationSource(this);// 设置定位监听
-//        aMap.setOnMarkerClickListener(this);
-//        aMap.setOnMapClickListener(this);
-//        aMap.setOnInfoWindowClickListener(this);
-//        aMap.getUiSettings().setMyLocationButtonEnabled(true);// 设置默认定位按钮是否显示
-//        aMap.setMyLocationEnabled(true);// 设置为true表示显示定位层并可触发定位，false表示隐藏定位层并不可触发定位，默认是false
-//        geocoderSearch = new GeocodeSearch(this);
-//        geocoderSearch.setOnGeocodeSearchListener(this);
-//        markerOption = new MarkerOptions();
     }
 
     @Override
@@ -488,6 +465,7 @@ public class Main2Activity extends AppCompatActivity
 
     @Override
     public void onMapClick(LatLng latLng) {
+
         if(curShowWindowMarker!=null){
             curShowWindowMarker.hideInfoWindow();
         }
@@ -852,6 +830,7 @@ public class Main2Activity extends AppCompatActivity
 
     public String initcolor(long date,Integer zhouqi){
         String  color = C.GARY;
+
         if (zhouqi != null && zhouqi > 0) {
             if(zhouqi>project.getMaxcycle()){
                 color = getZhouqi(date, project.getMaxcycle());

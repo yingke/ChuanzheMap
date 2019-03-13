@@ -140,6 +140,8 @@ public class QiandaoActivity extends AppCompatActivity implements AMapLocationLi
         setContentView(R.layout.activity_qiandao);
         ButterKnife.bind(this);
         Intent intent = getIntent();
+
+        btn_qiandao.setText("确定");
         items = (PointItems) intent.getSerializableExtra("items");
 
         mLocationClient = new AMapLocationClient(getApplication());
