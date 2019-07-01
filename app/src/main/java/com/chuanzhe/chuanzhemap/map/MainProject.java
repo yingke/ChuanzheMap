@@ -67,7 +67,7 @@ public class MainProject extends AppCompatActivity  implements LocationSource,
     private AMapLocationClient mlocationClient;
     private AMapLocationClientOption mLocationOption;
     private MarkerOptions markerOption;
-    private int limit = 100; // 每页的数据是500条
+    private int limit = 50; // 每页的数据是500条
     private int curPage = 0; // 当前页的编号，从0开始
     private Marker curShowWindowMarker;
     private SimpleDateFormat df ;//设置日期格式

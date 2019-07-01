@@ -40,6 +40,13 @@ public class QiandaoActivity extends AppCompatActivity implements AMapLocationLi
     EditText et_dingdan;
     @BindView(R.id.btn_qiandao)
     Button btn_qiandao;
+    @BindView(R.id.et_shangpinname)
+    EditText et_shangpinname;
+    @BindView(R.id.et_shangpindanjia)
+    EditText et_shangpindanjia;
+    @BindView(R.id.et_shuliang)
+    EditText et_shangpinshuliang;
+
     private PointItems items;
     private Integer cunhuo = 0;
     private Integer buhuo = 0;
@@ -47,6 +54,10 @@ public class QiandaoActivity extends AppCompatActivity implements AMapLocationLi
     private String id;
     private Double latitude;
     private Double longitude;
+    private String shangpinname;
+    private Float shangpindanjia;
+    private Integer shangpinshuliang;
+
     //声明AMapLocationClient类对象
     public AMapLocationClient mLocationClient = null;
     private LatLng piontLatlng;
@@ -74,11 +85,18 @@ public class QiandaoActivity extends AppCompatActivity implements AMapLocationLi
                 cunhuo = Integer.valueOf(et_cunhuo.getText().toString().trim());
                 buhuo = Integer.valueOf(et_buhuo.getText().toString().trim());
                 dingdanhao = et_dingdan.getText().toString().trim();
+                shangpinname = et_shangpinname.getText().toString().trim();
+                shangpindanjia = Float.valueOf(et_shangpindanjia.getText().toString().trim());
+                shangpinshuliang = Integer.valueOf(et_shangpinshuliang.getText().toString().trim());
+
 
                     Qiandao qiandao = new Qiandao();
                     qiandao.setCunhuoliang(cunhuo);
                     qiandao.setBuhuoliang(buhuo);
                     qiandao.setDingdanhao(dingdanhao);
+                    qiandao.setGoodsname(shangpinname);
+                    qiandao.setGoodsPrice(shangpindanjia);
+                    qiandao.setGoodsquantity(shangpinshuliang);
                     qiandao.setUser(BmobUser.getCurrentUser(MyUser.class));
                     qiandao.setItems(items);
 

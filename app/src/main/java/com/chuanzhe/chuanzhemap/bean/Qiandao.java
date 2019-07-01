@@ -12,31 +12,28 @@ public class Qiandao extends BmobObject{
     private String dingdanhao;
     private MyUser user;
     private PointItems items;
+    private String goodsname;//名称
+    private  Float goodsPrice;//单价
+    private Integer goodsquantity; //数量
 
     public Qiandao() {
     }
 
-    public Qiandao(int cunhuoliang, int buhuoliang, String dingdanhao, MyUser user, PointItems items) {
-        this.cunhuoliang = cunhuoliang;
-        this.buhuoliang = buhuoliang;
-        this.dingdanhao = dingdanhao;
-        this.user = user;
-        this.items = items;
-    }
 
-    public int getCunhuoliang() {
+
+    public Integer getCunhuoliang() {
         return cunhuoliang;
     }
 
-    public void setCunhuoliang(int cunhuoliang) {
+    public void setCunhuoliang(Integer cunhuoliang) {
         this.cunhuoliang = cunhuoliang;
     }
 
-    public int getBuhuoliang() {
+    public Integer getBuhuoliang() {
         return buhuoliang;
     }
 
-    public void setBuhuoliang(int buhuoliang) {
+    public void setBuhuoliang(Integer buhuoliang) {
         this.buhuoliang = buhuoliang;
     }
 
@@ -62,5 +59,29 @@ public class Qiandao extends BmobObject{
 
     public void setItems(PointItems items) {
         this.items = items;
+    }
+
+    public String getGoodsname() {
+        return goodsname;
+    }
+
+    public void setGoodsname(String goodsname) {
+        this.goodsname = goodsname;
+    }
+
+    public Float getGoodsPrice() {
+        return goodsPrice;
+    }
+
+    public void setGoodsPrice(Float goodsPrice) {
+        this.goodsPrice = goodsPrice;
+    }
+
+    public Integer getGoodsquantity() {
+        return goodsquantity;
+    }
+
+    public void setGoodsquantity(Integer goodsquantity) {
+        this.goodsquantity = goodsquantity;
     }
 }

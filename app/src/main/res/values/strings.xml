@@ -52,6 +52,8 @@
     <string name="nav_header_subtitle">Copyright © 2018 - 2019 SmartMap</string>
     <string name="nav_header_desc">Navigation header</string>
     <string name="action_settings">Settings</string>
+    <string name="dingdanhao">订单号:</string>
+    <string name="shangpinname">商品名称</string>
 
 
 </resources>
