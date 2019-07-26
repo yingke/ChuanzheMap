@@ -123,7 +123,20 @@ public class MainActivity extends AppCompatActivity implements MyItemClickListen
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
        //toast(myUser.getUsername()+"222222");
-        dialog();
+        int itemid = item.getItemId();
+
+        //noinspection SimplifiableIfStatement
+        if (itemid == R.id.action_userinfo) {
+            dialog();
+            return true;
+        }else if (itemid == R.id.action_shangping){
+
+
+        }else if (itemid == R.id.action_tongji){
+
+
+        }
+
 
         return super.onOptionsItemSelected(item);
     }

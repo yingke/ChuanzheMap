@@ -5,8 +5,22 @@
     <item
         android:id="@+id/action_userinfo"
         android:orderInCategory="0"
-        app:icon="@mipmap/user"
-        app:showAsAction="always"
+        android:icon="@drawable/ic_person_black_24dp"
+        app:showAsAction="ifRoom"
+
         android:title="注销" />
+    <item
+        android:id="@+id/action_shangping"
+        android:orderInCategory="1"
+        android:icon="@drawable/ic_shopping"
+        app:showAsAction="ifRoom"
+        android:title="商品管理" />
+    <item
+        android:id="@+id/action_tongji"
+        android:orderInCategory="2"
+        app:showAsAction="ifRoom"
+        android:icon="@drawable/ic_tongji"
+        android:title="商品统计" />
+
 
 </menu>
