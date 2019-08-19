@@ -28,7 +28,9 @@ import com.chuanzhe.chuanzhemap.adapter.MapRVAdapter;
 import com.chuanzhe.chuanzhemap.adapter.MyItemClickListener;
 import com.chuanzhe.chuanzhemap.bean.MapProject;
 import com.chuanzhe.chuanzhemap.bean.MyUser;
+import com.chuanzhe.chuanzhemap.goods.GoodsActivity;
 import com.chuanzhe.chuanzhemap.login.LoginActivity;
+import com.chuanzhe.chuanzhemap.map.PointDetalActivity;
 import com.chuanzhe.chuanzhemap.utility.C;
 
 import java.util.ArrayList;
@@ -61,8 +63,6 @@ public class MainActivity extends AppCompatActivity implements MyItemClickListen
         }
 
     }
-
-
     private MyUser myUser;
     private MapRVAdapter adapter;
     private List<MapProject> prolist;
@@ -130,13 +130,15 @@ public class MainActivity extends AppCompatActivity implements MyItemClickListen
             dialog();
             return true;
         }else if (itemid == R.id.action_shangping){
+            Intent intent = new Intent();
+            intent.setClass(MainActivity.this,GoodsActivity.class);
+            startActivity(intent);
 
 
         }else if (itemid == R.id.action_tongji){
 
 
         }
-
 
         return super.onOptionsItemSelected(item);
     }
@@ -145,6 +147,8 @@ public class MainActivity extends AppCompatActivity implements MyItemClickListen
         View v = LayoutInflater.from(MainActivity.this).inflate(R.layout.dialog_view,null);
         final EditText et_projectname = (EditText)v.findViewById(R.id.et_projectname);
         final EditText et_projectmiaoshu = (EditText)v.findViewById(R.id.et_projectmiashu);
+        et_projectname.setHint("请输入项目名称");
+        et_projectmiaoshu.setHint("请输入项目描述");
         Button btn_ok = (Button)v.findViewById(R.id.btn_OK);
         Button btn_quxiao = (Button)v.findViewById(R.id.btn_quxiao);
 

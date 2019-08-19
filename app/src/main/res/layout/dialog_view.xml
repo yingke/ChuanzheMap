@@ -15,7 +15,7 @@
             android:id="@+id/et_projectname"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/hint_projectname" />
+             />
 
     </android.support.design.widget.TextInputLayout>
 
@@ -34,7 +34,7 @@
             android:id="@+id/et_projectmiashu"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/hint_miaoshu" />
+            />
     </android.support.design.widget.TextInputLayout>
 
     <Button
