@@ -1,9 +1,12 @@
 package com.chuanzhe.chuanzhemap.goods;
 
 import android.support.design.widget.FloatingActionButton;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.DividerItemDecoration;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.InputFilter;
 import android.text.InputType;
@@ -17,6 +20,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.chuanzhe.chuanzhemap.R;
+import com.chuanzhe.chuanzhemap.adapter.GoodsAdapter;
 import com.chuanzhe.chuanzhemap.bean.Goods;
 import com.chuanzhe.chuanzhemap.bean.MyUser;
 import com.chuanzhe.chuanzhemap.utility.C;
@@ -39,6 +43,7 @@ public class GoodsActivity extends AppCompatActivity {
     @BindView(R.id.fab_goods)
     FloatingActionButton fabgoods;
     private List<Goods> goodsList;
+    private GoodsAdapter goodsAdapter;
     @OnClick(R.id.fab_goods) void addGoods(){
         addproject();
     }
@@ -48,9 +53,19 @@ public class GoodsActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_goods);
+        ActionBar actionBar =getSupportActionBar();
+        actionBar.setTitle("商品管理");
         ButterKnife.bind(this);
         goodsList = new ArrayList<>();
+
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this,LinearLayoutManager.VERTICAL,false);
+        recgoods.setLayoutManager(linearLayoutManager);
+        recgoods.addItemDecoration(new DividerItemDecoration(this,DividerItemDecoration.VERTICAL));
+        goodsAdapter = new GoodsAdapter(GoodsActivity.this,goodsList);
+        recgoods.setAdapter(goodsAdapter);
         getgoods();
+
+
 
     }
 
@@ -66,7 +81,7 @@ public class GoodsActivity extends AppCompatActivity {
                     Log.i("Goods",String.valueOf(list.size()));
 
                     goodsList.addAll(list);
-                    //adapter.notifyDataSetChanged();
+                    goodsAdapter.notifyDataSetChanged();
                 }
             });
 
