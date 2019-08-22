@@ -12,14 +12,7 @@ public class Qiandao extends BmobObject{
     private String dingdanhao;
     private MyUser user;
     private PointItems items;
-    private String goodsname;//名称
-    private  Float goodsPrice;//单价
-    private Integer goodsquantity; //数量
-
-    public Qiandao() {
-    }
-
-
+    private Goods goods;//商品
 
     public Integer getCunhuoliang() {
         return cunhuoliang;
@@ -61,20 +54,12 @@ public class Qiandao extends BmobObject{
         this.items = items;
     }
 
-    public String getGoodsname() {
-        return goodsname;
+    public Goods getGoods() {
+        return goods;
     }
 
-    public void setGoodsname(String goodsname) {
-        this.goodsname = goodsname;
-    }
-
-    public Float getGoodsPrice() {
-        return goodsPrice;
-    }
-
-    public void setGoodsPrice(Float goodsPrice) {
-        this.goodsPrice = goodsPrice;
+    public void setGoods(Goods goods) {
+        this.goods = goods;
     }
 
     public Integer getGoodsquantity() {
@@ -84,4 +69,11 @@ public class Qiandao extends BmobObject{
     public void setGoodsquantity(Integer goodsquantity) {
         this.goodsquantity = goodsquantity;
     }
+
+    private Integer goodsquantity; //数量
+
+    public Qiandao() {
+    }
+
+
 }

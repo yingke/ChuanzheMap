@@ -73,7 +73,7 @@ public class GoodsActivity extends AppCompatActivity {
     private void getgoods(){
         if(C.isNetworkConnected(this)){
             BmobQuery<Goods> query = new BmobQuery<Goods>();
-          //  query.addWhereEqualTo("myUser", BmobUser.getCurrentUser(MyUser.class));
+            query.addWhereEqualTo("myUser", BmobUser.getCurrentUser(MyUser.class));
 
             query.findObjects(new FindListener<Goods>() {
                 @Override
