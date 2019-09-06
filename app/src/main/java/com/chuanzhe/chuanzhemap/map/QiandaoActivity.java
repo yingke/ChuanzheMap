@@ -1,12 +1,19 @@
 package com.chuanzhe.chuanzhemap.map;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.KeyEvent;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.amap.api.location.AMapLocation;
@@ -16,18 +23,24 @@ import com.amap.api.location.AMapLocationListener;
 import com.amap.api.maps2d.AMapUtils;
 import com.amap.api.maps2d.model.LatLng;
 import com.chuanzhe.chuanzhemap.R;
+import com.chuanzhe.chuanzhemap.bean.Goods;
 import com.chuanzhe.chuanzhemap.bean.MyUser;
 import com.chuanzhe.chuanzhemap.bean.PointItems;
 import com.chuanzhe.chuanzhemap.bean.Qiandao;
+import com.chuanzhe.chuanzhemap.utility.C;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import cn.bmob.v3.BmobQuery;
 import cn.bmob.v3.BmobUser;
 import cn.bmob.v3.exception.BmobException;
+import cn.bmob.v3.listener.FindListener;
 import cn.bmob.v3.listener.SaveListener;
 import cn.bmob.v3.listener.UpdateListener;
 
@@ -40,13 +53,13 @@ public class QiandaoActivity extends AppCompatActivity implements AMapLocationLi
     EditText et_dingdan;
     @BindView(R.id.btn_qiandao)
     Button btn_qiandao;
-    @BindView(R.id.et_shangpinname)
-    EditText et_shangpinname;
-    @BindView(R.id.et_shangpindanjia)
-    EditText et_shangpindanjia;
+    @BindView(R.id.spinner)
+    Spinner sp_shangpinname;
+
     @BindView(R.id.et_shuliang)
     EditText et_shangpinshuliang;
-
+    private List<Goods> goodsList;
+    private String[] goodsnames;
     private PointItems items;
     private Integer cunhuo = 0;
     private Integer buhuo = 0;
@@ -54,8 +67,7 @@ public class QiandaoActivity extends AppCompatActivity implements AMapLocationLi
     private String id;
     private Double latitude;
     private Double longitude;
-    private String shangpinname;
-    private Float shangpindanjia;
+    private Goods goods;
     private Integer shangpinshuliang;
 
     //声明AMapLocationClient类对象
@@ -68,7 +80,7 @@ public class QiandaoActivity extends AppCompatActivity implements AMapLocationLi
     private boolean issamedate;
     //声明AMapLocationClientOption对象
     public AMapLocationClientOption option = null;
-
+    ArrayAdapter<String> adapter;
     @OnClick(R.id.btn_qiandao) void qiandao(){
 
         if (isqiandaoing){
@@ -85,8 +97,7 @@ public class QiandaoActivity extends AppCompatActivity implements AMapLocationLi
                 cunhuo = Integer.valueOf(et_cunhuo.getText().toString().trim());
                 buhuo = Integer.valueOf(et_buhuo.getText().toString().trim());
                 dingdanhao = et_dingdan.getText().toString().trim();
-                shangpinname = et_shangpinname.getText().toString().trim();
-                shangpindanjia = Float.valueOf(et_shangpindanjia.getText().toString().trim());
+
                 shangpinshuliang = Integer.valueOf(et_shangpinshuliang.getText().toString().trim());
 
 
@@ -94,8 +105,7 @@ public class QiandaoActivity extends AppCompatActivity implements AMapLocationLi
                     qiandao.setCunhuoliang(cunhuo);
                     qiandao.setBuhuoliang(buhuo);
                     qiandao.setDingdanhao(dingdanhao);
-                    qiandao.setGoodsname(shangpinname);
-                    qiandao.setGoodsPrice(shangpindanjia);
+                    qiandao.setGoods(goods);
                     qiandao.setGoodsquantity(shangpinshuliang);
                     qiandao.setUser(BmobUser.getCurrentUser(MyUser.class));
                     qiandao.setItems(items);
@@ -152,6 +162,47 @@ public class QiandaoActivity extends AppCompatActivity implements AMapLocationLi
   @OnClick(R.id.btn_QD_quxiao) void quxiao(){
         finish();
   }
+
+
+    @SuppressLint("HandlerLeak")
+    Handler handler = new Handler(){
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            switch (msg.what){
+                case 0:
+                    Bundle bundle = msg.getData();
+                    ArrayList list = bundle.getParcelableArrayList("list");
+                    goodsList.addAll(list);
+                    goodsnames = getnames(goodsList);
+                    adapter=new ArrayAdapter<String>(QiandaoActivity.this,android.R.layout.simple_spinner_item, goodsnames);
+                    adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                    sp_shangpinname .setAdapter(adapter);
+
+                    break;
+                case 1:
+
+                    break;
+            }
+
+
+        }
+    };
+
+    private String[] getnames(List<Goods> goodsList) {
+        String[] names;
+        if(goodsList.size()==0){
+            names = new String[0];
+        }else {
+             names = new String[goodsList.size()];
+            for (int i = 0; i < goodsList.size(); i++) {
+                names[i] =goodsList.get(i).getGoodsName();
+            }
+        }
+
+        return names;
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -167,6 +218,24 @@ public class QiandaoActivity extends AppCompatActivity implements AMapLocationLi
         mLocationClient.setLocationListener(this);
 
         setmap();
+        goodsList = new ArrayList<>();
+        getgoods();
+        sp_shangpinname.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                goods = goodsList.get(position);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+
+
+//绑定 Adapter到控件
+
+
 
     }
 
@@ -175,6 +244,35 @@ public class QiandaoActivity extends AppCompatActivity implements AMapLocationLi
     public boolean onKeyDown(int keyCode, KeyEvent event) {
 
         return super.onKeyDown(keyCode, event);
+    }
+
+    private void getgoods(){
+        if(C.isNetworkConnected(this)){
+            BmobQuery<Goods> query = new BmobQuery<Goods>();
+            query.addWhereEqualTo("myUser", BmobUser.getCurrentUser(MyUser.class));
+
+            query.findObjects(new FindListener<Goods>() {
+                @Override
+                public void done(List<Goods> list, BmobException e) {
+                    Log.i("Goods",String.valueOf(list.size()));
+
+
+
+                    Message msg = handler.obtainMessage();
+                    Bundle bundle = new Bundle();
+                    bundle.putParcelableArrayList("list",(ArrayList)list);
+                    msg.what = 0;
+                    msg.setData(bundle);
+                    handler.sendMessage(msg);
+
+                }
+            });
+
+        }else {
+
+            toast("暂无网络····");
+        }
+
     }
 
 
