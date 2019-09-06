@@ -74,6 +74,10 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/filepaths" />
         </provider>
+        <provider
+            android:name="cn.bmob.v3.util.BmobContentProvider"
+            android:authorities="com.chuanzhe.chuanzhemap.BmobContentProvider">
+        </provider>
     </application>
 
 </manifest>

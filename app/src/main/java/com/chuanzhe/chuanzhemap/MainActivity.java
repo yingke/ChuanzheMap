@@ -246,10 +246,11 @@ public class MainActivity extends AppCompatActivity implements MyItemClickListen
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 BmobUser.logOut();   //清除缓存用户对象
-                if(BmobUser.getCurrentUser() == null){
+                if(BmobUser.getCurrentUser(MyUser.class) == null){
                     startActivity(new Intent(MainActivity.this,LoginActivity.class));
                     finish();
                 }
+
 
 
                 dialog.dismiss();

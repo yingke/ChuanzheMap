@@ -21,6 +21,7 @@ public class MyApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+        Bmob.resetDomain("http://appsdk.longestech.com/8/");
         Bmob.initialize(this, C.Bmob_APPID);
 
         Context context = getApplicationContext();
